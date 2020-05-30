@@ -1,0 +1,32 @@
+{
+  "name": "garage-console-api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StevenAFC/garage-console-api.git"
+  },
+  "author": "Steven Beeching",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/StevenAFC/garage-console-api/issues"
+  },
+  "homepage": "https://github.com/StevenAFC/garage-console-api#readme",
+  "dependencies": {
+    "apollo-datasource": "^0.7.1",
+    "apollo-datasource-rest": "^0.9.2",
+    "apollo-server": "^2.14.1",
+    "apollo-server-testing": "^2.14.1",
+    "dotenv": "^8.2.0",
+    "graphql": "^15.0.0",
+    "isemail": "^3.2.0",
+    "sequelize": "^5.21.11",
+    "sqlite3": "^4.2.0",
+    "uuid": "^8.1.0"
+  }
+}
