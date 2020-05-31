@@ -16,7 +16,8 @@ const typeDefs = gql`
         id: ID!
         temperature: Float!
         humidity: Float!
-        date: String!
+        createdAt: String!
+        updatedAt: String!
     }
 `;
 
