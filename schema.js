@@ -4,9 +4,7 @@ const typeDefs = gql`
     type Query {
         me: User
         Atmospheres: [Atmosphere]
-    }
-    type Mutation {
-        login(email: String): String
+        openGarageDoor: Boolean
     }
     type User {
         id: ID!

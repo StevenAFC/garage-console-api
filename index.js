@@ -8,11 +8,13 @@ const resolvers = require('./resolvers');
 const { createStore } = require('./utils');
 
 const AtmosphereAPI = require('./datasources/atmosphere');
+const PiAPI = require('./datasources/pi');
 
 const store = createStore();
 
 const dataSources = () => ({
     atmosphereAPI: new AtmosphereAPI({ store }),
+    piAPI: new PiAPI()
 });
 
 const context = async ({ req }) => {
