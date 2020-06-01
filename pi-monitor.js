@@ -1,24 +1,31 @@
 const Gpio = require('onoff').Gpio;
 
-const GPIOEnabled = true
-
 class PiMonitor {
 
     pubsub
+    store
+    alarm
 
-    constructor(pubsub) {
+    constructor({pubsub, store, alarm}) {
         this.pubsub = pubsub
+        this.store = store
+        this.alarm = alarm
     }
 
     initialise() {
-        console.log("Initialising IO")        
+        console.log("Initialising IO")   
+        this.contactSensor()     
     }
 
     contactSensor() {
-        contactSensor = new Gpio(6, 'in', 'both')
-        this.contactSensor.watch((err, value) => {
-            this.pubsub.publish("DOOR_STATUS", { doorStatus: "CONTACT SENSOR" })
-        })
+        try {
+            const contactSensorIO = new Gpio(6, 'in', 'falling', { debounceTimeout: 25, activeLow: true })
+            contactSensorIO.watch((err, value) => {
+                this.alarm.alert({ sensorName: "REAR_DOOR_CONTACT_SENSOR" })
+            })
+        } catch (e) {
+            console.log(e);
+        }
     }
 
 }

@@ -1,8 +1,6 @@
 const { DataSource } = require('apollo-datasource');
 const Gpio = require('onoff').Gpio;
 
-const GPIOEnabled = true
-
 class PiApi extends DataSource {
 
     async openGarageDoor(pubsub) {
@@ -11,17 +9,15 @@ class PiApi extends DataSource {
         try {
             pubsub.publish("DOOR_STATUS", { doorStatus: "OPENING" })
             global.doorOpening = true;
-            if(GPIOEnabled) {
-                const openPin = new Gpio(17, 'out')
-                openPin.writeSync(1)
-            }
+
+            const openPin = new Gpio(17, 'out')
+            openPin.writeSync(1)
 
             setTimeout(() => {
                 global.doorOpening = false;
-                if(GPIOEnabled) {
-                    openPin.writeSync(0)
-                    openPin.unexport()
-                }
+                openPin.writeSync(0)
+                openPin.unexport()
+
                 pubsub.publish("DOOR_STATUS", { doorStatus: "OPEN" })
             }, 2000)
 
@@ -38,17 +34,13 @@ class PiApi extends DataSource {
         try {
             pubsub.publish("DOOR_STATUS", { doorStatus: "CLOSING" })
             global.doorOpening = true;
-            if(GPIOEnabled) {
-                const openPin = new Gpio(18, 'out')
-                openPin.writeSync(1)
-            }
+            const openPin = new Gpio(18, 'out')
+            openPin.writeSync(1)
 
             setTimeout(() => {
                 global.doorOpening = false;
-                if(GPIOEnabled) {
-                    openPin.writeSync(0)
-                    openPin.unexport()
-                }
+                openPin.writeSync(0)
+                openPin.unexport()
                 pubsub.publish("DOOR_STATUS", { doorStatus: "CLOSED" })
             }, 2000)
 

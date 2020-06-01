@@ -31,20 +31,18 @@ module.exports.createStore = () => {
         storage: './store.sqlite'
     });
 
-    const users = db.define('user', {
-        createdAt: Sequelize.DATE,
-        updatedAt: Sequelize.DATE,
-        email: Sequelize.STRING,
-        token: Sequelize.STRING,
-    });
-
     const atmospheres = db.define('atmosphere', {
         createdAt: Sequelize.DATE,
         temperature: Sequelize.FLOAT,
         humidity: Sequelize.FLOAT,
     });
 
+    const alerts = db.define('alert', {
+        createdAt: Sequelize.DATE,
+        sensorName: Sequelize.STRING,
+    });
+
     db.sync();
 
-    return { db, users, atmospheres };
+    return { db, atmospheres, alerts };
 }

@@ -2,22 +2,29 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
     type Query {
-        me: User
         Atmospheres: [Atmosphere]
+        alerts: [Alert]
         openGarageDoor: Boolean
         closeGarageDoor: Boolean
     }
     type Subscription {
         doorStatus: String
-    }
-    type User {
-        id: ID!
-        email: String!
+        alarmStatus: AlarmState
+        alert: Alert
     }
     type Atmosphere {
         id: ID!
         temperature: Float!
         humidity: Float!
+        createdAt: String!
+        updatedAt: String!
+    }
+    type AlarmState {
+        state: String
+    }
+    type Alert {
+        id: ID!
+        sensorName: String!
         createdAt: String!
         updatedAt: String!
     }
