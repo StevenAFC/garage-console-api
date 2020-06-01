@@ -9,6 +9,8 @@ const { createStore } = require('./utils');
 const AtmosphereAPI = require('./datasources/atmosphere');
 const PiAPI = require('./datasources/pi');
 
+const PiMonitor = require('./pi-monitor');
+
 const store = createStore();
 
 const dataSources = () => ({
@@ -16,9 +18,13 @@ const dataSources = () => ({
     piAPI: new PiAPI()
 });
 
+
 global.doorOpening = false
 
 const pubsub = new PubSub();
+
+piMonitor = new PiMonitor(pubsub);
+piMonitor.initialise();
 
 const context = ({ req, res }) => ({req, res, pubsub })
 

@@ -1,7 +1,7 @@
 const { DataSource } = require('apollo-datasource');
 const Gpio = require('onoff').Gpio;
 
-const GPIOEnabled = false
+const GPIOEnabled = true
 
 class PiApi extends DataSource {
 
