@@ -6,6 +6,9 @@ const typeDefs = gql`
         Atmospheres: [Atmosphere]
         openGarageDoor: Boolean
     }
+    type Subscription {
+        something: Float
+    }
     type User {
         id: ID!
         email: String!

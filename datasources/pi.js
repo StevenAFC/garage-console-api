@@ -3,22 +3,29 @@ const Gpio = require('onoff').Gpio;
 
 class PiApi extends DataSource {
 
-    openGarageDoor() {
-        try {
-            setTimeout(() => {
-                console.log("Opening garage door")
-                const openPin = new Gpio(17, 'out')
-                openPin.writeSync(1)
-                openPin.unexport()
-            }, 5000)
-        } 
-        catch (e) 
-        {
-            console.log(e)
-            return false;
-        }
+    async openGarageDoor(pubsub) {
+        pubsub.publish("SUBSCRIBE", { something: 125.4 })
 
-        return true;
+        console.log("Door opening")
+
+        if (global.doorOpening) return false
+
+        try {
+            global.doorOpening = true;
+            //const openPin = new Gpio(17, 'out')
+            //openPin.writeSync(1)
+
+            setTimeout(() => {
+                global.doorOpening = false;
+                //openPin.writeSync(0)
+                //openPin.unexport()
+            }, 2000)
+
+            return true
+        } catch (e) {
+            console.log(e)
+            return false
+        }
     }
 
 }

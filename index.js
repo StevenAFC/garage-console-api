@@ -1,7 +1,6 @@
 require('dotenv').config();
 
-const { ApolloServer } = require('apollo-server');
-const isEmail = require('isemail');
+const { ApolloServer, PubSub } = require('apollo-server');
 
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
@@ -17,19 +16,11 @@ const dataSources = () => ({
     piAPI: new PiAPI()
 });
 
-const context = async ({ req }) => {
-  // simple auth check on every request
-  //const auth = (req.headers && req.headers.authorization) || '';
-  //const email = new Buffer(auth, 'base64').toString('ascii');
+global.doorOpening = false
 
-  // if the email isn't formatted validly, return null for user
-  //if (!isEmail.validate(email)) return { user: null };
-  // find a user by their email
-  //const users = await store.users.findOrCreate({ where: { email } });
-  //const user = users && users[0] ? users[0] : null;
+const pubsub = new PubSub();
 
-  //return { user };
-};
+const context = ({ req, res }) => ({req, res, pubsub })
 
 const server = new ApolloServer({
     typeDefs,
@@ -53,10 +44,10 @@ if (process.env.NODE_ENV !== 'test') {
 
 module.exports = {
     dataSources,
-    context,
     typeDefs,
     resolvers,
     ApolloServer,
     store,
     server,
+    context
 };
