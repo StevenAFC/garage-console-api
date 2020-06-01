@@ -5,9 +5,10 @@ const typeDefs = gql`
         me: User
         Atmospheres: [Atmosphere]
         openGarageDoor: Boolean
+        closeGarageDoor: Boolean
     }
     type Subscription {
-        something: Float
+        doorStatus: String
     }
     type User {
         id: ID!

@@ -6,10 +6,13 @@ module.exports = {
         openGarageDoor: async(_, __, { dataSources, pubsub }) => {
             return await dataSources.piAPI.openGarageDoor(pubsub);
         },
+        closeGarageDoor: async(_, __, { dataSources, pubsub }) => {
+            return await dataSources.piAPI.closeGarageDoor(pubsub);
+        },
     },
     Subscription: {
-        something: {
-            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('SUBSCRIBE')
+        doorStatus: {
+            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('DOOR_STATUS')
         }
     }
   };

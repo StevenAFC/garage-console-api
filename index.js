@@ -27,6 +27,7 @@ const server = new ApolloServer({
     resolvers,
     dataSources,
     context,
+    cors: true,
     introspection: true,
     playground: true,
     engine: {
