@@ -24,9 +24,20 @@ const typeDefs = gql`
     }
     type Alert {
         id: ID!
-        sensorName: String!
         createdAt: String!
         updatedAt: String!
+        deviceId: ID!
+        device: [Device]
+    }
+    type Device {
+        createdAt: String!
+        updatedAt: String!
+        name: String!
+        gpio: Int
+        debounce: Int
+        inverted: Boolean
+        duration: Int
+        alarmSensor: Boolean
     }
 `;
 

@@ -11,7 +11,12 @@ class AlertAPI extends DataSource {
     }
 
     async getAlerts() {
-        const found = await this.store.alerts.findAll();
+        const found = await this.store.alerts.findAll({
+            include: [{
+                model: this.store.devices 
+            }]
+        });
+        console.log(found)
         return found;
     }
 }

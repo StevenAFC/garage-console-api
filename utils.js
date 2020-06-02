@@ -45,7 +45,7 @@ module.exports.createStore = () => {
     const devices = db.define('device', {
         createdAt: Sequelize.DATE,
         updatedAt: Sequelize.DATE,
-        deviceName: {
+        name: {
             type: Sequelize.STRING,
             unique: true
         },
