@@ -12,6 +12,9 @@ module.exports = {
         alarmDevices: async (_, __, { dataSources }) => {
             return await dataSources.deviceAPI.alarmDevices();
         },
+        alarmStatus: async (_, __, { dataSources }) => {
+            return await dataSources.alarmAPI.getAlarmState();
+        },
     },
     Mutation: {
         devicePulse: async(_, args, { dataSources }) => {
@@ -22,9 +25,6 @@ module.exports = {
         },
     },
     Subscription: {
-        doorStatus: {
-            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('DOOR_STATUS')
-        },
         alarmStatus: {
             subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('ALARM_STATUS')
         },

@@ -14,6 +14,10 @@ class AlarmAPI extends DataSource {
     async setAlarmState(state) {
         this.alarm.setAlarmState(state)
     }
+
+    async getAlarmState() {
+        return this.alarm.getAlarmState();
+    }
 }
 
 module.exports = AlarmAPI;

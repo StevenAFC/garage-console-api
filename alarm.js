@@ -2,6 +2,7 @@ class Alarm {
 
     pubsub
     store
+    status = "DISARMED"
 
     constructor({pubsub, store}) {
         this.pubsub = pubsub
@@ -9,7 +10,13 @@ class Alarm {
     }
 
     async alert ({ deviceId }) {
-        console.log(deviceId)
+
+        if (this.status === "DISARMED") {
+            console.log('\u001b[' + 34 + 'm' + "Device ID " + state + "has been triggered however the alarm is not armed" + '\u001b[0m')
+            return true
+        }
+
+        console.log('\u001b[' + 32 + 'm' + "Device ID " + state + "has been triggered" + '\u001b[0m')
 
         this.store.alerts.create({
             deviceId: deviceId
@@ -18,6 +25,8 @@ class Alarm {
         await this.store.devices.update({ alarmTriggered: true }, { where: { id: deviceId } })
 
         this.refreshDevices();
+
+        //activate siren
 
         return true
     }
@@ -29,7 +38,7 @@ class Alarm {
             },
             include: [{
                 model: this.store.alerts,
-                limit: 3, 
+                limit: 1, 
                 order: [["createdAt", "DESC"]]
             }]
         });
@@ -39,15 +48,30 @@ class Alarm {
         })
     }
 
+    getAlarmState() {
+        return this.state
+    }
+
+    alarmState(state) {
+        this.state = state
+
+        console.log('\u001b[' + 32 + 'm' + "Alarm State has been changed to " + state + '\u001b[0m')
+
+        this.pubsub.publish("ALARM_STATUS", {
+            alarmStatus: this.state
+        })
+    }
+
     async setAlarmState(state) {
         switch(state) {
-            case "DEACTIVATE":
-                await this.store.devices.update({ alarmTriggered: false }, { where: { alarmTriggered: true } })
-                this.refreshDevices();
-                break;
             case "DISARM":
+                await this.store.devices.update({ alarmTriggered: false }, { where: { alarmTriggered: true } })
+                this.refreshDevices()
+                this.alarmState("DISARMED")
+                //Activate Siren
                 break;
             case "ARM":
+                this.alarmState("ARMED")
                 break;
             default:
                 return false

@@ -22,7 +22,7 @@ class DeviceAPI extends DataSource {
             },
             include: [{
                 model: this.store.alerts,
-                limit: 3, 
+                limit: 1, 
                 order: [["createdAt", "DESC"]]
             }]
         });

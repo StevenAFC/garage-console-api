@@ -47,6 +47,8 @@ const server = new ApolloServer({
     }
 });
 
+alarm.setAlarmState("DISARM")
+
 if (process.env.NODE_ENV !== 'test') {
     server
         .listen({ port: process.env.PORT || 4000 })

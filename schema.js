@@ -6,14 +6,14 @@ const typeDefs = gql`
         alerts: [Alert]
         devices: [Device]
         alarmDevices: [Device]
+        alarmStatus: String!
     }
     type Mutation {
         devicePulse(id: ID!): Boolean
         alarmState(state: String!): Boolean
     }
     type Subscription {
-        doorStatus: String
-        alarmStatus: AlarmState
+        alarmStatus: String
         alarmDevices: [Device]
     }
     type Atmosphere {
@@ -22,9 +22,6 @@ const typeDefs = gql`
         humidity: Float!
         createdAt: String!
         updatedAt: String!
-    }
-    type AlarmState {
-        state: String
     }
     type Alert {
         id: ID!
