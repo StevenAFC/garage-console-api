@@ -5,6 +5,7 @@ const typeDefs = gql`
         atmospheres: [Atmosphere]
         alerts: [Alert]
         devices: [Device]
+        getAlarmDevices: [Device]
         openGarageDoor: Boolean
         closeGarageDoor: Boolean
     }
@@ -41,7 +42,8 @@ const typeDefs = gql`
         debounce: Int
         inverted: Boolean
         duration: Int
-        alarmSensor: Boolean
+        alarmDevice: Boolean
+        alerts: [Alert]
     }
 `;
 

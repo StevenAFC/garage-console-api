@@ -53,14 +53,12 @@ module.exports.createStore = () => {
         debounce: Sequelize.INTEGER,
         inverted: Sequelize.BOOLEAN,
         duration: Sequelize.INTEGER,
-        alarmSensor: Sequelize.BOOLEAN,
+        alarmDevice: Sequelize.BOOLEAN,
     });
 
     alerts.belongsTo(devices, { foreignKey: 'deviceId' })
 
-    devices.associate = (models) => {
-        devices.hasMany(models.alert);
-    };
+    devices.hasMany(alerts);
 
     db.sync();
 

@@ -9,6 +9,9 @@ module.exports = {
         devices: async (_, __, { dataSources }) => {
             return await dataSources.deviceAPI.getDevices();
         },
+        getAlarmDevices: async (_, __, { dataSources }) => {
+            return await dataSources.deviceAPI.getAlarmDevices();
+        },
         openGarageDoor: async(_, __, { dataSources, pubsub }) => {
             return await dataSources.piAPI.openGarageDoor(pubsub);
         },

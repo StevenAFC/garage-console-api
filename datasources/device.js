@@ -14,6 +14,18 @@ class DeviceAPI extends DataSource {
         const found = await this.store.devices.findAll();
         return found;
     }
+
+    async getAlarmDevices() {
+        const found = await this.store.devices.findAll({ 
+            where: {
+                alarmDevice: true
+            },
+            include: [{
+                model: this.store.alerts 
+            }]
+        });
+        return found;
+    }
 }
 
 module.exports = DeviceAPI;
