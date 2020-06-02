@@ -16,7 +16,6 @@ class AlertAPI extends DataSource {
                 model: this.store.devices 
             }]
         });
-        console.log(found)
         return found;
     }
 }

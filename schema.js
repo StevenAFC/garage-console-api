@@ -28,7 +28,7 @@ const typeDefs = gql`
         createdAt: String!
         updatedAt: String!
         deviceId: ID!
-        device: [Device]
+        device: Device
     }
     type Device {
         createdAt: String!
