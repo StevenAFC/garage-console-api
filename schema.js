@@ -44,6 +44,7 @@ const typeDefs = gql`
         duration: Int
         alarmDevice: Boolean
         alerts: [Alert]
+        input: Boolean
     }
 `;
 

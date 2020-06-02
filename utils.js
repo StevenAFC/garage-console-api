@@ -54,6 +54,7 @@ module.exports.createStore = () => {
         inverted: Sequelize.BOOLEAN,
         duration: Sequelize.INTEGER,
         alarmDevice: Sequelize.BOOLEAN,
+        input: Sequelize.BOOLEAN,
     });
 
     alerts.belongsTo(devices, { foreignKey: 'deviceId' })
