@@ -10,26 +10,23 @@ const AtmosphereAPI = require('./datasources/atmosphere');
 const AlertAPI = require('./datasources/alert');
 const PiAPI = require('./datasources/pi');
 
-const PiMonitor = require('./pi-monitor');
+const PiManager = require('./pi-manager');
 const Alarm = require('./alarm');
 
 const store = createStore();
-
-const dataSources = () => ({
-    atmosphereAPI: new AtmosphereAPI({ store }),
-    alertAPI: new AlertAPI({ store }),
-    piAPI: new PiAPI()
-});
-
-
-global.doorOpening = false
 
 const pubsub = new PubSub();
 
 alarm = new Alarm({pubsub, store});
 
-piMonitor = new PiMonitor({pubsub, store, alarm});
-piMonitor.initialise();
+piManager = new PiManager({pubsub, store, alarm});
+piManager.initialise();
+
+const dataSources = () => ({
+    atmosphereAPI: new AtmosphereAPI({ store }),
+    alertAPI: new AlertAPI({ store }),
+    piAPI: new PiAPI({ piManager })
+});
 
 const context = ({ req, res }) => ({req, res, pubsub })
 
