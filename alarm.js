@@ -8,18 +8,18 @@ class Alarm {
         this.store = store
     }
 
-    alert = ({ sensorName }) => {
-        console.log(sensorName)
+    alert = ({ deviceId }) => {
+        console.log(deviceId)
         const time = Date.now()
 
         this.store.alerts.create({
-            sensorName: sensorName
+            deviceId: deviceId
         })
 
         this.pubsub.publish("ALERT", {
             alert: {
                 createdAt: time,
-                sensorName: sensorName
+                deviceId: deviceId
             }
         })
     }

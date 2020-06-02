@@ -21,7 +21,9 @@ class DeviceAPI extends DataSource {
                 alarmDevice: true
             },
             include: [{
-                model: this.store.alerts 
+                model: this.store.alerts,
+                limit: 3, 
+                order: [["createdAt", "DESC"]]
             }]
         });
         return found;

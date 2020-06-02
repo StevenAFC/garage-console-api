@@ -56,6 +56,7 @@ class PiManager {
             
             setTimeout(() => {
                 if (Gpio.accessible) {
+                    const openPin = new Gpio(gpio, 'out')
                     openPin.writeSync(0)
                     openPin.unexport()
                     console.log('\u001b[' + 32 + 'm' + "GPIO " + gpio + " pin been set to low" + '\u001b[0m')

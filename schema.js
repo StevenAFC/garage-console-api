@@ -35,6 +35,7 @@ const typeDefs = gql`
         device: Device
     }
     type Device {
+        id: ID!
         createdAt: String!
         updatedAt: String!
         name: String!
