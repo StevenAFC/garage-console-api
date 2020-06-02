@@ -4,6 +4,7 @@ const typeDefs = gql`
     type Query {
         Atmospheres: [Atmosphere]
         alerts: [Alert]
+        devices: [Device]
         openGarageDoor: Boolean
         closeGarageDoor: Boolean
     }
