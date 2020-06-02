@@ -8,6 +8,9 @@ const typeDefs = gql`
         openGarageDoor: Boolean
         closeGarageDoor: Boolean
     }
+    type Mutation {
+        devicePulse(id: ID): Boolean
+    }
     type Subscription {
         doorStatus: String
         alarmStatus: AlarmState

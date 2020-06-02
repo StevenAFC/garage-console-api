@@ -16,6 +16,11 @@ module.exports = {
             return await dataSources.piAPI.closeGarageDoor(pubsub);
         },
     },
+    Mutation: {
+        devicePulse: async(_, args, { dataSources, pubsub }) => {
+            return await dataSources.piAPI.devicePulse(args.id);
+        },
+    },
     Subscription: {
         doorStatus: {
             subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('DOOR_STATUS')

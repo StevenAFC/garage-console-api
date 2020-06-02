@@ -27,7 +27,7 @@ const dataSources = () => ({
     atmosphereAPI: new AtmosphereAPI({ store }),
     alertAPI: new AlertAPI({ store }),
     deviceAPI: new DeviceAPI({ store }),
-    piAPI: new PiAPI({ piManager })
+    piAPI: new PiAPI({ store, piManager })
 });
 
 const context = ({ req, res }) => ({req, res, pubsub })

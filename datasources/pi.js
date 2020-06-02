@@ -2,19 +2,20 @@ const { DataSource } = require('apollo-datasource');
 
 class PiApi extends DataSource {
 
-    piManager
-
-    constructor( { piManager }) {
+    constructor({ piManager, store }) {
         super()
         this.piManager = piManager;
+        this.store = store;
     }
 
-    async openGarageDoor(pubsub) {
-        return piManager.relayTrigger({ gpio: 17, duration: 2000 })
+    async devicePulse(id) {
+        let device = await this.store.devices.findByPk(id);
+        return piManager.relayTrigger({ gpio: device.gpio, duration: device.duration })
     }
 
-    async closeGarageDoor(pubsub) {
-        return piManager.relayTrigger({ gpio: 18, duration: 2000 })
+    async deviceSwitch(id) {
+        let device = await this.store.devices.findByPk(id);
+        return piManager.relayTrigger({ gpio: device.gpio })
     }
 
 }
