@@ -15,7 +15,7 @@ class DeviceAPI extends DataSource {
         return found;
     }
 
-    async getAlarmDevices() {
+    async alarmDevices() {
         const found = await this.store.devices.findAll({ 
             where: {
                 alarmDevice: true

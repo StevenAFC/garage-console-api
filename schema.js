@@ -5,17 +5,16 @@ const typeDefs = gql`
         atmospheres: [Atmosphere]
         alerts: [Alert]
         devices: [Device]
-        getAlarmDevices: [Device]
-        openGarageDoor: Boolean
-        closeGarageDoor: Boolean
+        alarmDevices: [Device]
     }
     type Mutation {
-        devicePulse(id: ID): Boolean
+        devicePulse(id: ID!): Boolean
+        alarmState(state: String!): Boolean
     }
     type Subscription {
         doorStatus: String
         alarmStatus: AlarmState
-        alert: Alert
+        alarmDevices: [Device]
     }
     type Atmosphere {
         id: ID!
@@ -44,6 +43,7 @@ const typeDefs = gql`
         inverted: Boolean
         duration: Int
         alarmDevice: Boolean
+        alarmTriggered: Boolean
         alerts: [Alert]
         input: Boolean
     }

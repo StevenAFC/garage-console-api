@@ -6,6 +6,7 @@ const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 const { createStore } = require('./utils');
 
+const AlarmAPI = require('./datasources/alarm');
 const AtmosphereAPI = require('./datasources/atmosphere');
 const AlertAPI = require('./datasources/alert');
 const DeviceAPI = require('./datasources/device');
@@ -27,7 +28,8 @@ const dataSources = () => ({
     atmosphereAPI: new AtmosphereAPI({ store }),
     alertAPI: new AlertAPI({ store }),
     deviceAPI: new DeviceAPI({ store }),
-    piAPI: new PiAPI({ store, piManager })
+    piAPI: new PiAPI({ store, piManager }),
+    alarmAPI: new AlarmAPI({ store, alarm })
 });
 
 const context = ({ req, res }) => ({req, res, pubsub })

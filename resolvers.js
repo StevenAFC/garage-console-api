@@ -9,19 +9,16 @@ module.exports = {
         devices: async (_, __, { dataSources }) => {
             return await dataSources.deviceAPI.getDevices();
         },
-        getAlarmDevices: async (_, __, { dataSources }) => {
-            return await dataSources.deviceAPI.getAlarmDevices();
-        },
-        openGarageDoor: async(_, __, { dataSources, pubsub }) => {
-            return await dataSources.piAPI.openGarageDoor(pubsub);
-        },
-        closeGarageDoor: async(_, __, { dataSources, pubsub }) => {
-            return await dataSources.piAPI.closeGarageDoor(pubsub);
+        alarmDevices: async (_, __, { dataSources }) => {
+            return await dataSources.deviceAPI.alarmDevices();
         },
     },
     Mutation: {
-        devicePulse: async(_, args, { dataSources, pubsub }) => {
+        devicePulse: async(_, args, { dataSources }) => {
             return await dataSources.piAPI.devicePulse(args.id);
+        },
+        alarmState: async(_, args, { dataSources }) => {
+            return await dataSources.alarmAPI.setAlarmState(args.state);
         },
     },
     Subscription: {
@@ -31,8 +28,8 @@ module.exports = {
         alarmStatus: {
             subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('ALARM_STATUS')
         },
-        alert: {
-            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('ALERT')
+        alarmDevices: {
+            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('ALARM_DEVICES')
         }
     }
   };
