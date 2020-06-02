@@ -1,6 +1,6 @@
 module.exports = {
     Query: {
-        Atmospheres: async (_, __, { dataSources }) => {
+        atmospheres: async (_, __, { dataSources }) => {
             return await dataSources.atmosphereAPI.getAtmospheres();
         },
         alerts: async (_, __, { dataSources }) => {

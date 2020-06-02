@@ -2,7 +2,7 @@ const { gql } = require('apollo-server');
 
 const typeDefs = gql`
     type Query {
-        Atmospheres: [Atmosphere]
+        atmospheres: [Atmosphere]
         alerts: [Alert]
         devices: [Device]
         openGarageDoor: Boolean
