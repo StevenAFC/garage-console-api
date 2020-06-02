@@ -39,10 +39,30 @@ module.exports.createStore = () => {
 
     const alerts = db.define('alert', {
         createdAt: Sequelize.DATE,
-        sensorName: Sequelize.STRING,
+        deviceId: Sequelize.INTEGER,
     });
+
+    const devices = db.define('device', {
+        createdAt: Sequelize.DATE,
+        updatedAt: Sequelize.DATE,
+        deviceName: {
+            type: Sequelize.STRING,
+            unique: true
+        },
+        gpio: Sequelize.INTEGER,
+        debounce: Sequelize.INTEGER,
+        inverted: Sequelize.BOOLEAN,
+        duration: Sequelize.INTEGER,
+        alarmSensor: Sequelize.BOOLEAN,
+    });
+
+    alerts.belongsTo(devices, { foreignKey: 'deviceId' })
+
+    devices.associate = (models) => {
+        devices.hasMany(models.alert);
+    };
 
     db.sync();
 
-    return { db, atmospheres, alerts };
+    return { db, atmospheres, alerts, devices };
 }

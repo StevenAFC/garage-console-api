@@ -8,6 +8,7 @@ const { createStore } = require('./utils');
 
 const AtmosphereAPI = require('./datasources/atmosphere');
 const AlertAPI = require('./datasources/alert');
+const DeviceAPI = require('./datasources/device');
 const PiAPI = require('./datasources/pi');
 
 const PiManager = require('./pi-manager');
@@ -25,6 +26,7 @@ piManager.initialise();
 const dataSources = () => ({
     atmosphereAPI: new AtmosphereAPI({ store }),
     alertAPI: new AlertAPI({ store }),
+    deviceAPI: new DeviceAPI({ store }),
     piAPI: new PiAPI({ piManager })
 });
 
