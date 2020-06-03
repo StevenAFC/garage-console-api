@@ -26,7 +26,7 @@ class Alarm {
 
         this.refreshDevices();
 
-        //activate siren
+        console.log('\u001b[' + 32 + 'm' + "SIREN SIREN SIREN" + '\u001b[0m')
 
         return true
     }
@@ -68,7 +68,7 @@ class Alarm {
                 await this.store.devices.update({ alarmTriggered: false }, { where: { alarmTriggered: true } })
                 this.refreshDevices()
                 this.alarmState("DISARMED")
-                //Activate Siren
+                console.log('\u001b[' + 32 + 'm' + "Siren silenced" + '\u001b[0m')
                 break;
             case "ARM":
                 this.alarmState("ARMED")
