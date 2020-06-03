@@ -99,13 +99,12 @@ class Alarm {
                 await this.store.devices.update({ alarmTriggered: false }, { where: { alarmTriggered: true } })
                 this.refreshDevices()
                 this.alarmState("DISARMED")
-                this.triggerAlarm(1)
+                this.triggerAlarm(0)
                 console.log('\u001b[' + 32 + 'm' + "Siren silenced" + '\u001b[0m')
                 break;
             case "ARM":
                 this.alarmState("ARMED")
                 this.refreshDevices()
-                this.triggerAlarm(0)
                 break;
             default:
                 return false
