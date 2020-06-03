@@ -1,7 +1,5 @@
 class Alarm {
 
-    pubsub
-    store
     status = "DISARMED"
 
     constructor({pubsub, store}) {
@@ -12,11 +10,11 @@ class Alarm {
     async alert ({ deviceId }) {
 
         if (this.status === "DISARMED") {
-            console.log('\u001b[' + 34 + 'm' + "Device ID " + state + "has been triggered however the alarm is not armed" + '\u001b[0m')
+            console.log('\u001b[' + 34 + 'm' + "Device ID " + this.status + " has been triggered however the alarm is not armed" + '\u001b[0m')
             return true
         }
 
-        console.log('\u001b[' + 32 + 'm' + "Device ID " + state + "has been triggered" + '\u001b[0m')
+        console.log('\u001b[' + 32 + 'm' + "Device ID " + this.status + " has been triggered" + '\u001b[0m')
 
         this.store.alerts.create({
             deviceId: deviceId
@@ -49,16 +47,16 @@ class Alarm {
     }
 
     getAlarmState() {
-        return this.state
+        return this.status
     }
 
     alarmState(state) {
-        this.state = state
+        this.status = state
 
         console.log('\u001b[' + 32 + 'm' + "Alarm State has been changed to " + state + '\u001b[0m')
 
         this.pubsub.publish("ALARM_STATUS", {
-            alarmStatus: this.state
+            alarmStatus: this.status
         })
     }
 
@@ -72,6 +70,7 @@ class Alarm {
                 break;
             case "ARM":
                 this.alarmState("ARMED")
+                this.refreshDevices()
                 break;
             default:
                 return false
