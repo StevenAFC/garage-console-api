@@ -28,6 +28,17 @@ class PiManager {
         }
     }
 
+    relayLatch({ gpio, state }) {
+        if (Gpio.accessible) {
+            const openPin = new Gpio(gpio, 'out')
+            openPin.writeSync(state)
+            openPin.unexport()
+            console.log('\u001b[' + 32 + 'm' + "GPIO " + gpio + " has been set to " + state + '\u001b[0m')
+        } else {
+            console.log('\u001b[' + 31 + 'm' + "GPIO " + gpio + " pin cannot be set to high as the GPIO is inaccessible" + '\u001b[0m')
+        }
+    }
+
     relayTrigger({ gpio, duration }) {
 
         try {
@@ -36,7 +47,7 @@ class PiManager {
             if (Gpio.accessible) {
                 const openPin = new Gpio(gpio, 'out')
                 openPin.writeSync(1)
-                console.log('\u001b[' + 32 + 'm' + "GPIO " + gpio + " has been set to high" + '\u001b[0m')
+                console.log('\u001b[' + 32 + 'm' + "GPIO " + gpio + " has been set to high for " + duration + "ms" + '\u001b[0m')
             } else {
                 console.log('\u001b[' + 31 + 'm' + "GPIO " + gpio + " pin cannot be set to high as the GPIO is inaccessible" + '\u001b[0m')
             }

@@ -25,6 +25,8 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "graphql": "^15.0.0",
+    "graphql-redis-subscriptions": "^2.2.1",
+    "graphql-subscriptions": "^1.1.0",
     "isemail": "^3.2.0",
     "onoff": "^6.0.0",
     "sequelize": "^5.21.11",

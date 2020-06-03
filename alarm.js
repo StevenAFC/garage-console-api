@@ -26,11 +26,11 @@ class Alarm {
     async alert (deviceId) {
 
         if (this.status === "DISARMED") {
-            console.log('\u001b[' + 34 + 'm' + "Device ID " + this.status + " has been triggered however the alarm is not armed" + '\u001b[0m')
+            console.log('\u001b[' + 34 + 'm' + "Device ID " + deviceId + " has been triggered however the alarm is not armed" + '\u001b[0m')
             return true
         }
 
-        console.log('\u001b[' + 32 + 'm' + "Device ID " + this.status + " has been triggered" + '\u001b[0m')
+        console.log('\u001b[' + 32 + 'm' + "Device ID " + deviceId + " has been triggered" + '\u001b[0m')
 
         this.store.alerts.create({
             deviceId: deviceId
@@ -38,11 +38,26 @@ class Alarm {
 
         await this.store.devices.update({ alarmTriggered: true }, { where: { id: deviceId } })
 
-        this.refreshDevices();
+        this.refreshDevices()
+
+        this.triggerAlarm(1)
 
         console.log('\u001b[' + 32 + 'm' + "SIREN SIREN SIREN" + '\u001b[0m')
 
         return true
+    }
+
+    async triggerAlarm(triggered) {
+        const outputDevices = await this.store.devices.findAll({
+            where: {
+                input: 0,
+                alarmDevice: 1
+            }
+        })
+
+        outputDevices && outputDevices.map((device) => {
+            this.piManager.relayTrigger({ gpio: device.gpio, duration: 500 })
+        }) 
     }
 
     async refreshDevices() {
@@ -87,6 +102,7 @@ class Alarm {
             case "ARM":
                 this.alarmState("ARMED")
                 this.refreshDevices()
+                this.triggerAlarm(0)
                 break;
             default:
                 return false

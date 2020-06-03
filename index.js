@@ -1,6 +1,8 @@
 require('dotenv').config();
 
-const { ApolloServer, PubSub } = require('apollo-server');
+const { ApolloServer } = require('apollo-server');
+
+const { RedisPubSub } = require('graphql-redis-subscriptions');
 
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
@@ -17,7 +19,7 @@ const Alarm = require('./alarm');
 
 const store = createStore();
 
-const pubsub = new PubSub();
+const pubsub = new RedisPubSub();
 
 piManager = new PiManager({pubsub, store});
 
