@@ -19,35 +19,36 @@ class Alarm {
         })
 
         inputDevices.map((device) => {
-            this.piManager.watchInputDevice(device, () => this.alert(device.id))
+            this.piManager.watchInputDevice({ device, cb: () => this.alert(device) })
         }) 
     }
 
-    async alert (deviceId) {
+    async alert (device) {
 
         if (this.status === "DISARMED") {
-            console.log('\u001b[' + 34 + 'm' + "Device ID " + deviceId + " has been triggered however the alarm is not armed" + '\u001b[0m')
+            console.log('\u001b[' + 34 + 'm' + "Device " + device.name + " (" + device.gpio + ") has been triggered however the alarm is not armed" + '\u001b[0m')
             return true
         }
 
-        console.log('\u001b[' + 32 + 'm' + "Device ID " + deviceId + " has been triggered" + '\u001b[0m')
+        console.log('\u001b[' + 32 + 'm' + "Device " + device.name + " (" + device.gpio + ") has been triggered" + '\u001b[0m')
 
         this.store.alerts.create({
-            deviceId: deviceId
+            deviceId: device.id
         })
 
-        await this.store.devices.update({ alarmTriggered: true }, { where: { id: deviceId } })
+        await this.store.devices.update({ alarmTriggered: true }, { where: { id: device.id } })
 
         this.refreshDevices()
 
         this.triggerAlarm(1)
 
-        console.log('\u001b[' + 32 + 'm' + "SIREN SIREN SIREN" + '\u001b[0m')
-
         return true
     }
 
     async triggerAlarm(triggered) {
+
+        console.log('\u001b[' + 32 + 'm' + "Alarm triggered! State: " +  triggered + '\u001b[0m')
+
         const outputDevices = await this.store.devices.findAll({
             where: {
                 input: 0,
@@ -56,7 +57,8 @@ class Alarm {
         })
 
         outputDevices && outputDevices.map((device) => {
-            this.piManager.relayTrigger({ gpio: device.gpio, duration: 500 })
+            console.log('\u001b[' + 32 + 'm' + "Alarm Output Device " +  device.name + " (" + device.gpio + ")" + '\u001b[0m')
+            this.piManager.relayLatch({ device: device, state: triggered })
         }) 
     }
 
@@ -97,6 +99,7 @@ class Alarm {
                 await this.store.devices.update({ alarmTriggered: false }, { where: { alarmTriggered: true } })
                 this.refreshDevices()
                 this.alarmState("DISARMED")
+                this.triggerAlarm(1)
                 console.log('\u001b[' + 32 + 'm' + "Siren silenced" + '\u001b[0m')
                 break;
             case "ARM":

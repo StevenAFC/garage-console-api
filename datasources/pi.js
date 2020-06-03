@@ -9,15 +9,9 @@ class PiApi extends DataSource {
     }
 
     async devicePulse(id) {
-        let device = await this.store.devices.findByPk(id);
-        return piManager.relayTrigger({ gpio: device.gpio, duration: device.duration })
+        const device = await this.store.devices.findByPk(id);
+        return piManager.relayTrigger({ device: device, duration: device.duration })
     }
-
-    async deviceSwitch(id) {
-        let device = await this.store.devices.findByPk(id);
-        return piManager.relayTrigger({ gpio: device.gpio })
-    }
-
 }
 
 module.exports = PiApi;
