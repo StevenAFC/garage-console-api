@@ -4,32 +4,19 @@ class PiManager {
 
     jobs = {}
 
-    constructor({pubsub, store, alarm}) {
+    constructor({pubsub, store}) {
         this.pubsub = pubsub
         this.store = store
-        this.alarm = alarm
     }
 
-    async initialise() {
-        console.log("Initialising IO")
-        const inputDevices = await this.store.devices.findAll({
-            where: {
-                input: 1
-            }
-        })
-
-        inputDevices.map((device) => {
-            this.initialiseInputDevice(device)
-        }) 
-    }
-
-    initialiseInputDevice(device) {
+    watchInputDevice(device, cb) {
         try {
 
             if (Gpio.accessible) {
                 const inputDevice = new Gpio(device.gpio, 'in', 'falling', { debounceTimeout: device.debounce, activeLow: device.inverted })
                 inputDevice.watch((err, value) => {
-                    this.alarm.alert({ deviceId: device.id })
+                    console.log("Trying to call back")
+                    cb()
                 })
                 console.log('\u001b[' + 32 + 'm' + "GPIO " + device.gpio + " has been initialised" + '\u001b[0m')
             } else {

@@ -19,10 +19,10 @@ const store = createStore();
 
 const pubsub = new PubSub();
 
-alarm = new Alarm({pubsub, store});
+piManager = new PiManager({pubsub, store});
 
-piManager = new PiManager({pubsub, store, alarm});
-piManager.initialise();
+alarm = new Alarm({pubsub, store, piManager});
+alarm.initialise()
 
 const dataSources = () => ({
     atmosphereAPI: new AtmosphereAPI({ store }),

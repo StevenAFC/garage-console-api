@@ -2,12 +2,28 @@ class Alarm {
 
     status = "DISARMED"
 
-    constructor({pubsub, store}) {
+    constructor({pubsub, store, piManager}) {
         this.pubsub = pubsub
         this.store = store
+        this.piManager = piManager
     }
 
-    async alert ({ deviceId }) {
+    async initialise() {
+        console.log("Initialising alarm IO")
+        this.setAlarmState("DISARMED")
+        const inputDevices = await this.store.devices.findAll({
+            where: {
+                input: 1,
+                alarmDevice: 1
+            }
+        })
+
+        inputDevices.map((device) => {
+            this.piManager.watchInputDevice(device, () => this.alert(device.id))
+        }) 
+    }
+
+    async alert (deviceId) {
 
         if (this.status === "DISARMED") {
             console.log('\u001b[' + 34 + 'm' + "Device ID " + this.status + " has been triggered however the alarm is not armed" + '\u001b[0m')
