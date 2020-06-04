@@ -1,19 +1,19 @@
-const { DataSource } = require('apollo-datasource');
+const { DataSource } = require('apollo-datasource')
 
 class AtmosphereAPI extends DataSource {
-    constructor({ store }) {
-        super();
-        this.store = store;
-    }
+  constructor({ store }) {
+    super()
+    this.store = store
+  }
 
-    initialize(config) {
-        this.context = config.context;
-    }
+  initialize(config) {
+    this.context = config.context
+  }
 
-    async getAtmospheres() {
-        const found = await this.store.atmospheres.findAll();
-        return found;
-    }
+  async getAtmospheres() {
+    const found = await this.store.atmospheres.findAll()
+    return found
+  }
 }
 
-module.exports = AtmosphereAPI;
+module.exports = AtmosphereAPI

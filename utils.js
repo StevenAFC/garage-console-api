@@ -1,71 +1,46 @@
-const { Sequelize } = require ('sequelize')
-
-module.exports.paginateResults = ({
-    after: cursor,
-    pageSize = 20,
-    results,
-    getCursor = () => null,
-}) => {
-    if (pageSize < 1) return [];
-
-    if (!cursor) return results.slice(0, pageSize);
-    const cursorIndex = results.findIndex(item => {
-        let itemCusor = item.cursor ? item.cursor : getCursor(item);
-
-        return itemCusor ? cursor === itemCursor : false;
-    });
-
-    return cursorIndex >= 0
-        ? cursorIndex === results.length - 1
-            ? []
-            : results.slice(
-                cursorindex + 1,
-                Math.min(results.length, cursorIndex + 1 + pageSize),
-            )
-        : results.slice(0, pageSize);
-};
+const { Sequelize } = require('sequelize')
 
 module.exports.createStore = () => {
-    const db = new Sequelize({
-        dialect: 'sqlite',
-        storage: './store.sqlite'
-    });
+  const db = new Sequelize({
+    dialect: 'sqlite',
+    storage: './store.sqlite',
+  })
 
-    const atmospheres = db.define('atmosphere', {
-        createdAt: Sequelize.DATE,
-        temperature: Sequelize.FLOAT,
-        humidity: Sequelize.FLOAT,
-    });
+  const atmospheres = db.define('atmosphere', {
+    createdAt: Sequelize.DATE,
+    temperature: Sequelize.FLOAT,
+    humidity: Sequelize.FLOAT,
+  })
 
-    const alerts = db.define('alert', {
-        createdAt: Sequelize.DATE,
-        deviceId: Sequelize.INTEGER,
-    });
+  const alerts = db.define('alert', {
+    createdAt: Sequelize.DATE,
+    deviceId: Sequelize.INTEGER,
+  })
 
-    const devices = db.define('device', {
-        createdAt: Sequelize.DATE,
-        updatedAt: Sequelize.DATE,
-        name: {
-            type: Sequelize.STRING,
-            unique: true
-        },
-        gpio: Sequelize.INTEGER,
-        debounce: Sequelize.INTEGER,
-        inverted: Sequelize.BOOLEAN,
-        duration: Sequelize.INTEGER,
-        alarmDevice: Sequelize.BOOLEAN,
-        alarmTriggered: { 
-            type: Sequelize.BOOLEAN,
-            defaultValue: false
-        },
-        input: Sequelize.BOOLEAN,
-    });
+  const devices = db.define('device', {
+    createdAt: Sequelize.DATE,
+    updatedAt: Sequelize.DATE,
+    name: {
+      type: Sequelize.STRING,
+      unique: true,
+    },
+    gpio: Sequelize.INTEGER,
+    debounce: Sequelize.INTEGER,
+    inverted: Sequelize.BOOLEAN,
+    duration: Sequelize.INTEGER,
+    alarmDevice: Sequelize.BOOLEAN,
+    alarmTriggered: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    input: Sequelize.BOOLEAN,
+  })
 
-    alerts.belongsTo(devices, { foreignKey: 'deviceId' })
+  alerts.belongsTo(devices, { foreignKey: 'deviceId' })
 
-    devices.hasMany(alerts);
+  devices.hasMany(alerts)
 
-    db.sync();
+  db.sync()
 
-    return { db, atmospheres, alerts, devices };
+  return { db, atmospheres, alerts, devices }
 }
