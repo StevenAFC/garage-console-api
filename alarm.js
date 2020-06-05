@@ -103,6 +103,7 @@ class Alarm {
     const devices = await this.store.devices.findAll({
       where: {
         alarmDevice: true,
+        input: true,
       },
       include: [
         {

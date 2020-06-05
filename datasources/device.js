@@ -19,6 +19,7 @@ class DeviceAPI extends DataSource {
     const found = await this.store.devices.findAll({
       where: {
         alarmDevice: true,
+        input: true,
       },
       include: [
         {
