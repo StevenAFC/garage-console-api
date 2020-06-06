@@ -9,9 +9,12 @@ class PiManager {
   }
 
   initializeDevice({ device }) {
+    let alreadyInitiated = false
     this.devices.forEach((d) => {
-      if (d.id === device.id) return
+      if (d.id === device.id) alreadyInitiated = true
     })
+
+    if (alreadyInitiated) return
 
     let pin = null
     if (Gpio.accessible) {
@@ -21,7 +24,12 @@ class PiManager {
       })
     }
 
-    this.devices.push({ id: device.id, gpio: device.gpio, pin: pin })
+    this.devices.push({
+      id: device.id,
+      gpio: device.gpio,
+      pin: pin,
+      active: false,
+    })
   }
 
   getDevice({ device }) {
@@ -35,25 +43,53 @@ class PiManager {
         this.getDevice({ device }).pin.watch(() => {
           cb()
         })
-        console.log(
-          '\u001b[' +
-            32 +
-            'm' +
-            'GPIO ' +
-            device.gpio +
-            ' has been initialised' +
-            '\u001b[0m'
-        )
+
+        this.consoleLog({
+          device,
+          message: 'has been initialised',
+          colour: 32,
+        })
       } else {
-        console.log(
-          '\u001b[' +
-            31 +
-            'm' +
-            'GPIO ' +
-            device.gpio +
-            ' pin cannot be initialised as the GPIO is inaccessible' +
-            '\u001b[0m'
-        )
+        this.consoleLog({
+          device,
+          message: 'cannot be initialised as the GPIO is inaccessible',
+          colour: 32,
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  setActive({ device, state }) {
+    this.devices = this.devices.map((d) => {
+      if (d.id === device.id) d.active = state
+      return d
+    })
+  }
+
+  async toggle({ device }) {
+    this.initializeDevice({ device })
+    this.write({ device, state: !this.getDevice({ device }).active })
+  }
+
+  write({ device, state }) {
+    try {
+      this.initializeDevice({ device })
+      if (Gpio.accessible) {
+        this.getDevice({ device }).pin.writeSync(state ? 1 : 0)
+        this.setActive({ device, state })
+        this.consoleLog({
+          device,
+          message: 'has been set to: ' + state,
+          colour: 32,
+        })
+      } else {
+        this.consoleLog({
+          device,
+          message: 'pin cannot be set to high as the GPIO is inaccessible',
+          colour: 31,
+        })
       }
     } catch (e) {
       console.log(e)
@@ -61,112 +97,42 @@ class PiManager {
   }
 
   async relayLatch({ device, state }) {
-    this.initializeDevice({ device })
-
-    if (Gpio.accessible) {
-      this.getDevice({ device }).pin.writeSync(state)
-      console.log(
-        '\u001b[' +
-          32 +
-          'm' +
-          'Device ' +
-          device.name +
-          ' (' +
-          device.gpio +
-          ') has been set to ' +
-          state +
-          '\u001b[0m'
-      )
-    } else {
-      console.log(
-        '\u001b[' +
-          31 +
-          'm' +
-          'Device ' +
-          device.name +
-          ' (' +
-          device.gpio +
-          ') pin cannot be set to high as the GPIO is inaccessible' +
-          '\u001b[0m'
-      )
-    }
+    this.write({ device, state })
   }
 
   async relayTrigger({ device, duration }) {
-    try {
-      if (!this.jobs[device.gpio]) {
-        this.jobs[device.gpio] = 1
-      } else {
-        return false
-      }
-
-      this.initializeDevice({ device })
-
-      if (Gpio.accessible) {
-        this.getDevice({ device }).pin.writeSync(1)
-        console.log(
-          '\u001b[' +
-            32 +
-            'm' +
-            'Device ' +
-            device.name +
-            ' (' +
-            device.gpio +
-            ') has been set to high for ' +
-            duration +
-            'ms' +
-            '\u001b[0m'
-        )
-      } else {
-        console.log(
-          '\u001b[' +
-            31 +
-            'm' +
-            'Device ' +
-            device.name +
-            ' (' +
-            device.gpio +
-            ') pin cannot be set to high as the GPIO is inaccessible' +
-            '\u001b[0m'
-        )
-      }
-
-      setTimeout(() => {
-        if (Gpio.accessible) {
-          this.getDevice({ device }).pin.writeSync(0)
-          console.log(
-            '\u001b[' +
-              32 +
-              'm' +
-              'Device ' +
-              device.name +
-              ' (' +
-              device.gpio +
-              ') pin been set to low' +
-              '\u001b[0m'
-          )
-        } else {
-          console.log(
-            '\u001b[' +
-              31 +
-              'm' +
-              'Device ' +
-              device.name +
-              ' (' +
-              device.gpio +
-              ') pin cannot be set to low as the GPIO is inaccessible' +
-              '\u001b[0m'
-          )
-        }
-
-        this.jobs[device.gpio] = 0
-      }, duration)
-
-      return true
-    } catch (e) {
-      console.log(e)
+    if (!this.jobs[device.gpio]) {
+      this.jobs[device.gpio] = 1
+    } else {
       return false
     }
+
+    this.write({ device, state: 1 })
+
+    setTimeout(() => {
+      this.write({ device, state: 0 })
+
+      this.jobs[device.gpio] = 0
+    }, duration)
+
+    return true
+  }
+
+  consoleLog({ device, message, colour }) {
+    device
+      ? console.log(
+          '\u001b[' +
+            colour +
+            'm' +
+            'Device: ' +
+            device.name +
+            ' (' +
+            device.gpio +
+            ') ' +
+            message +
+            '\u001b[0m'
+        )
+      : console.log('\u001b[' + colour + 'm' + message + '\u001b[0m')
   }
 }
 

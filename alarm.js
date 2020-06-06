@@ -23,31 +23,20 @@ class Alarm {
 
   async alert(device) {
     if (this.status === 'DISARMED') {
-      console.log(
-        '\u001b[' +
-          34 +
-          'm' +
-          'Device ' +
-          device.name +
-          ' (' +
-          device.gpio +
-          ') has been triggered however the alarm is not armed' +
-          '\u001b[0m'
-      )
+      this.piManager.consoleLog({
+        device,
+        message: 'has been triggered however the alarm is not armed',
+        colour: 34,
+      })
+
       return true
     }
 
-    console.log(
-      '\u001b[' +
-        32 +
-        'm' +
-        'Device ' +
-        device.name +
-        ' (' +
-        device.gpio +
-        ') has been triggered' +
-        '\u001b[0m'
-    )
+    this.piManager.consoleLog({
+      device,
+      message: 'has been triggered',
+      colour: 32,
+    })
 
     this.store.alerts.create({
       deviceId: device.id,
@@ -65,15 +54,11 @@ class Alarm {
     return true
   }
 
-  async triggerAlarm(triggered) {
-    console.log(
-      '\u001b[' +
-        32 +
-        'm' +
-        'Alarm triggered! State: ' +
-        triggered +
-        '\u001b[0m'
-    )
+  async triggerAlarm(state) {
+    this.piManager.consoleLog({
+      message: 'Alarm state changed to: ' + state,
+      colour: 34,
+    })
 
     const outputDevices = await this.store.devices.findAll({
       where: {
@@ -84,18 +69,13 @@ class Alarm {
 
     outputDevices &&
       outputDevices.map((device) => {
-        console.log(
-          '\u001b[' +
-            32 +
-            'm' +
-            'Alarm Output Device ' +
-            device.name +
-            ' (' +
-            device.gpio +
-            ')' +
-            '\u001b[0m'
-        )
-        this.piManager.relayLatch({ device: device, state: triggered })
+        this.piManager.consoleLog({
+          device,
+          message: 'Alarm Output Device',
+          colour: 32,
+        })
+
+        this.piManager.relayLatch({ device: device, state })
       })
   }
 
@@ -126,14 +106,10 @@ class Alarm {
   alarmState(state) {
     this.status = state
 
-    console.log(
-      '\u001b[' +
-        32 +
-        'm' +
-        'Alarm State has been changed to ' +
-        state +
-        '\u001b[0m'
-    )
+    this.piManager.consoleLog({
+      message: 'Alarm State has been changed to ' + state,
+      colour: 32,
+    })
 
     this.pubsub.publish('ALARM_STATUS', {
       alarmStatus: this.status,
@@ -150,7 +126,11 @@ class Alarm {
         this.refreshDevices()
         this.alarmState('DISARMED')
         this.triggerAlarm(0)
-        console.log('\u001b[' + 32 + 'm' + 'Siren silenced' + '\u001b[0m')
+        this.piManager.consoleLog({
+          device: null,
+          message: 'Siren silenced ' + state,
+          colour: 32,
+        })
         break
       case 'ARM':
         this.alarmState('ARMED')
