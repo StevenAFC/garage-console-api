@@ -1,7 +1,6 @@
 require('dotenv').config()
 
 const { ApolloServer } = require('apollo-server')
-
 const { RedisPubSub } = require('graphql-redis-subscriptions')
 
 const typeDefs = require('./schema')
@@ -12,6 +11,7 @@ const AlarmAPI = require('./datasources/alarm')
 const AtmosphereAPI = require('./datasources/atmosphere')
 const AlertAPI = require('./datasources/alert')
 const DeviceAPI = require('./datasources/device')
+const UserAPI = require('./datasources/user')
 const PiAPI = require('./datasources/pi')
 
 const PiManager = require('./pi-manager')
@@ -21,12 +21,13 @@ const store = createStore()
 
 const pubsub = new RedisPubSub()
 
-piManager = new PiManager({ pubsub, store })
+const piManager = new PiManager({ pubsub, store })
 
-alarm = new Alarm({ pubsub, store, piManager })
+const alarm = new Alarm({ pubsub, store, piManager })
 alarm.initialise()
 
 const dataSources = () => ({
+  userAPI: new UserAPI({ store }),
   atmosphereAPI: new AtmosphereAPI({ store }),
   alertAPI: new AlertAPI({ store }),
   deviceAPI: new DeviceAPI({ store }),

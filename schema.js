@@ -11,6 +11,12 @@ const typeDefs = gql`
   type Mutation {
     devicePulse(id: ID!): Boolean
     alarmState(state: String!): Boolean
+    login(email: String!, password: String!): LoginResponse!
+    register(email: String!, password: String!): Boolean
+  }
+  type LoginResponse {
+    token: String
+    success: Boolean
   }
   type Subscription {
     alarmStatus: String
