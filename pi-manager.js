@@ -70,7 +70,9 @@ class PiManager {
 
   async toggle({ device }) {
     this.initializeDevice({ device })
-    this.write({ device, state: !this.getDevice({ device }).active })
+    const state = !this.getDevice({ device }).active
+    this.write({ device, state })
+    return { state, duration: null }
   }
 
   write({ device, state }) {
@@ -115,7 +117,7 @@ class PiManager {
       this.jobs[device.gpio] = 0
     }, duration)
 
-    return true
+    return { state: 1, duration }
   }
 
   consoleLog({ device, message, colour }) {

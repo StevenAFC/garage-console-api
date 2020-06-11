@@ -12,6 +12,10 @@ module.exports = {
       if (!dataSources.userAPI.authenticate({ req })) return null
       return await dataSources.deviceAPI.getDevices()
     },
+    outputDevices: async (_, __, { req, dataSources }) => {
+      if (!dataSources.userAPI.authenticate({ req })) return null
+      return await dataSources.deviceAPI.outputDevices()
+    },
     alarmDevices: async (_, __, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate({ req })) return null
       return await dataSources.deviceAPI.alarmDevices()

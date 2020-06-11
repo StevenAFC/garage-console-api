@@ -7,9 +7,10 @@ const typeDefs = gql`
     devices: [Device]
     alarmDevices: [Device]
     alarmStatus: String!
+    outputDevices: [Device]
   }
   type Mutation {
-    devicePulse(id: ID!): Boolean
+    devicePulse(id: ID!): DeviceState
     alarmState(state: String!): Boolean
     login(email: String!, password: String!): LoginResponse!
     register(email: String!, password: String!): Boolean
@@ -17,6 +18,10 @@ const typeDefs = gql`
   type LoginResponse {
     token: String
     success: Boolean
+  }
+  type DeviceState {
+    state: Boolean
+    duration: Int
   }
   type Subscription {
     alarmStatus: String
@@ -49,6 +54,8 @@ const typeDefs = gql`
     alarmTriggered: Boolean
     alerts: [Alert]
     input: Boolean
+    color: String
+    icon: String
   }
 `
 

@@ -12,9 +12,9 @@ class PiApi extends DataSource {
 
     // if device duration is null we are assuming that the device is a toggle
     if (device.duration === null) {
-      return this.piManager.toggle({ device })
+      return await this.piManager.toggle({ device })
     } else {
-      return this.piManager.relayTrigger({
+      return await this.piManager.relayTrigger({
         device: device,
         duration: device.duration,
       })
