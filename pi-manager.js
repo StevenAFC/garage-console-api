@@ -4,7 +4,6 @@ class PiManager {
   constructor({ pubsub, store }) {
     this.pubsub = pubsub
     this.store = store
-    this.jobs = {}
     this.devices = []
   }
 
@@ -29,6 +28,7 @@ class PiManager {
       gpio: device.gpio,
       pin: pin,
       active: false,
+      timeout: null,
     })
   }
 
@@ -68,6 +68,13 @@ class PiManager {
     })
   }
 
+  setTimeout({ device, timeout }) {
+    this.devices = this.devices.map((d) => {
+      if (d.id === device.id) d.timeout = timeout
+      return d
+    })
+  }
+
   async toggle({ device }) {
     this.initializeDevice({ device })
     const state = !this.getDevice({ device }).active
@@ -103,19 +110,24 @@ class PiManager {
   }
 
   async relayTrigger({ device, duration }) {
-    if (!this.jobs[device.gpio]) {
-      this.jobs[device.gpio] = 1
-    } else {
-      return false
+    const isActive = this.getDevice({ device })
+      ? this.getDevice({ device }).active
+      : false
+
+    if (isActive) {
+      this.write({ device, state: 0 })
+      clearTimeout(this.getDevice({ device }).timeout)
+      return { state: 0, duration: null }
     }
 
     this.write({ device, state: 1 })
 
-    setTimeout(() => {
-      this.write({ device, state: 0 })
-
-      this.jobs[device.gpio] = 0
-    }, duration)
+    this.setTimeout({
+      device,
+      timeout: setTimeout(() => {
+        this.write({ device, state: 0 })
+      }, duration),
+    })
 
     return { state: 1, duration }
   }
