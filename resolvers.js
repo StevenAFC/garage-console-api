@@ -24,6 +24,10 @@ module.exports = {
       if (!dataSources.userAPI.authenticate({ req })) return null
       return await dataSources.alarmAPI.getAlarmState()
     },
+    piStatus: async (_, __, { req, dataSources }) => {
+      if (!dataSources.userAPI.authenticate({ req })) return null
+      return await dataSources.piAPI.getSystemStatus()
+    },
   },
   Mutation: {
     devicePulse: async (_, args, { req, dataSources }) => {

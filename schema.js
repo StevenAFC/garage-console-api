@@ -8,6 +8,7 @@ const typeDefs = gql`
     alarmDevices: [Device]
     alarmStatus: String!
     outputDevices: [Device]
+    piStatus: PiStatus
   }
   type Mutation {
     devicePulse(id: ID!): DeviceState
@@ -22,6 +23,9 @@ const typeDefs = gql`
   type DeviceState {
     state: Boolean
     duration: Int
+  }
+  type PiStatus {
+    temp: Float
   }
   type Subscription {
     alarmStatus: String
