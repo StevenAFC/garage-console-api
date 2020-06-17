@@ -21,6 +21,20 @@ class PiApi extends DataSource {
     }
   }
 
+  async getDeviceStates() {
+    const deviceStates = this.piManager.getDevices()
+    const devices = await this.store.devices.findAll()
+
+    return devices.map((d) => {
+      const state = deviceStates.find((s) => s.id === d.id)
+
+      return {
+        device: d.dataValues,
+        state: state || { id: d.id, state: false },
+      }
+    })
+  }
+
   async devicePulse(id) {
     const device = await this.store.devices.findByPk(id)
 

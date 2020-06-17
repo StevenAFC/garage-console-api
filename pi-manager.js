@@ -27,13 +27,17 @@ class PiManager {
       id: device.id,
       gpio: device.gpio,
       pin: pin,
-      active: false,
+      state: false,
       timeout: null,
     })
   }
 
   getDevice({ device }) {
     return this.devices.find((d) => d.id === device.id)
+  }
+
+  getDevices() {
+    return this.devices
   }
 
   async watchInputDevice({ device, cb }) {
@@ -61,9 +65,9 @@ class PiManager {
     }
   }
 
-  setActive({ device, state }) {
+  setState({ device, state }) {
     this.devices = this.devices.map((d) => {
-      if (d.id === device.id) d.active = state
+      if (d.id === device.id) d.state = state
       return d
     })
   }
@@ -76,10 +80,15 @@ class PiManager {
   }
 
   async toggle({ device }) {
-    this.initializeDevice({ device })
-    const state = !this.getDevice({ device }).active
-    this.write({ device, state })
-    return { state, duration: null }
+    try {
+      this.initializeDevice({ device })
+      const state = !this.getDevice({ device }).state
+      this.write({ device, state })
+      return true
+    } catch (e) {
+      console.log(e)
+      return false
+    }
   }
 
   write({ device, state }) {
@@ -87,7 +96,10 @@ class PiManager {
       this.initializeDevice({ device })
       if (Gpio.accessible) {
         this.getDevice({ device }).pin.writeSync(state ? 1 : 0)
-        this.setActive({ device, state })
+        this.setState({ device, state })
+        this.pubsub.publish('DEVICE_STATE', {
+          deviceState: this.getDevice({ device }),
+        })
         this.consoleLog({
           device,
           message: 'has been set to: ' + state,
@@ -110,26 +122,30 @@ class PiManager {
   }
 
   async relayTrigger({ device, duration }) {
-    const isActive = this.getDevice({ device })
-      ? this.getDevice({ device }).active
-      : false
+    try {
+      const isActive = this.getDevice({ device })
+        ? this.getDevice({ device }).state
+        : false
 
-    if (isActive) {
-      this.write({ device, state: 0 })
-      clearTimeout(this.getDevice({ device }).timeout)
-      return { state: 0, duration: null }
-    }
-
-    this.write({ device, state: 1 })
-
-    this.setTimeout({
-      device,
-      timeout: setTimeout(() => {
+      if (isActive) {
+        clearTimeout(this.getDevice({ device }).timeout)
         this.write({ device, state: 0 })
-      }, duration),
-    })
+        return true
+      }
 
-    return { state: 1, duration }
+      this.write({ device, state: 1 })
+
+      this.setTimeout({
+        device,
+        timeout: setTimeout(() => {
+          this.write({ device, state: 0 })
+        }, duration),
+      })
+      return true
+    } catch (e) {
+      console.log(e)
+      return false
+    }
   }
 
   consoleLog({ device, message, colour }) {

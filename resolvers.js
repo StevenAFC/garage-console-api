@@ -28,6 +28,10 @@ module.exports = {
       if (!dataSources.userAPI.authenticate({ req })) return null
       return await dataSources.piAPI.getSystemStatus()
     },
+    deviceStates: async (_, __, { req, dataSources }) => {
+      if (!dataSources.userAPI.authenticate({ req })) return null
+      return await dataSources.piAPI.getDeviceStates()
+    },
   },
   Mutation: {
     devicePulse: async (_, args, { req, dataSources }) => {
@@ -51,6 +55,9 @@ module.exports = {
     },
     alarmDevices: {
       subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('ALARM_DEVICES'),
+    },
+    deviceState: {
+      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('DEVICE_STATE'),
     },
   },
 }

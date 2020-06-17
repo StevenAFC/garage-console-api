@@ -5,13 +5,14 @@ const typeDefs = gql`
     atmospheres: [Atmosphere]
     alerts: [Alert]
     devices: [Device]
+    deviceStates: [DeviceStatus]
     alarmDevices: [Device]
     alarmStatus: String!
     outputDevices: [Device]
     piStatus: PiStatus
   }
   type Mutation {
-    devicePulse(id: ID!): DeviceState
+    devicePulse(id: ID!): Boolean
     alarmState(state: String!): Boolean
     login(email: String!, password: String!): LoginResponse!
     register(email: String!, password: String!): Boolean
@@ -20,9 +21,13 @@ const typeDefs = gql`
     token: String
     success: Boolean
   }
+  type DeviceStatus {
+    device: Device
+    state: DeviceState
+  }
   type DeviceState {
+    id: Int!
     state: Boolean
-    duration: Int
   }
   type PiStatus {
     temp: Float
@@ -30,6 +35,7 @@ const typeDefs = gql`
   type Subscription {
     alarmStatus: String
     alarmDevices: [Device]
+    deviceState: DeviceState
   }
   type Atmosphere {
     id: ID!
