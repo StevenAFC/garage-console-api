@@ -49,9 +49,7 @@ class UserAPI extends DataSource {
     return true
   }
 
-  authenticate({ req }) {
-    const { token } = req.headers
-
+  authenticate(token) {
     if (jwt.verify(token, process.env.SECRET)) {
       return true
     } else {

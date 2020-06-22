@@ -26,8 +26,10 @@ const piManager = new PiManager({ pubsub, store })
 const alarm = new Alarm({ pubsub, store, piManager })
 alarm.initialise()
 
+const userAPI = new UserAPI({ store })
+
 const dataSources = () => ({
-  userAPI: new UserAPI({ store }),
+  userAPI,
   atmosphereAPI: new AtmosphereAPI({ store }),
   alertAPI: new AlertAPI({ store }),
   deviceAPI: new DeviceAPI({ store }),
@@ -45,6 +47,14 @@ const server = new ApolloServer({
   cors: true,
   introspection: true,
   playground: true,
+  subscriptions: {
+    onConnect: (connectionParams) => {
+      if (connectionParams.token) {
+        return userAPI.authenticate(connectionParams.token)
+      }
+      throw new Error('Missing authentication token')
+    },
+  },
   engine: {
     apiKey: process.env.ENGINE_API_KEY,
   },
