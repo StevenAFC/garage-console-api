@@ -5,7 +5,7 @@ const { RedisPubSub } = require('graphql-redis-subscriptions')
 
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
-const { createStore } = require('./utils')
+const { createStore } = require('./store')
 
 const AlarmAPI = require('./datasources/alarm')
 const AtmosphereAPI = require('./datasources/atmosphere')
