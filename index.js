@@ -1,6 +1,10 @@
 require('dotenv').config()
 
-const { ApolloServer } = require('apollo-server')
+const express = require('express')
+const fs = require('fs')
+const https = require('https')
+const http = require('http')
+const { ApolloServer } = require('apollo-server-express')
 const { RedisPubSub } = require('graphql-redis-subscriptions')
 
 const typeDefs = require('./schema')
@@ -18,15 +22,31 @@ const PiManager = require('./pi-manager')
 const Alarm = require('./alarm')
 
 const store = createStore()
-
 const pubsub = new RedisPubSub()
-
 const piManager = new PiManager({ pubsub, store })
-
 const alarm = new Alarm({ pubsub, store, piManager })
 alarm.initialise()
-
 const userAPI = new UserAPI({ store })
+const context = ({ req, res }) => ({ req, res, pubsub })
+
+const configurations = {
+  // Note: You may need sudo to run on port 443
+  production: {
+    ssl: true,
+    port: 443,
+    hostname: '77.98.107.162',
+    playground: true,
+  },
+  development: {
+    ssl: false,
+    port: 4000,
+    hostname: 'localhost',
+    playground: true,
+  },
+}
+
+const environment = process.env.NODE_ENV || 'production'
+const config = configurations[environment]
 
 const dataSources = () => ({
   userAPI,
@@ -37,16 +57,14 @@ const dataSources = () => ({
   alarmAPI: new AlarmAPI({ store, alarm }),
 })
 
-const context = ({ req, res }) => ({ req, res, pubsub })
-
-const server = new ApolloServer({
+const apollo = new ApolloServer({
   typeDefs,
   resolvers,
   dataSources,
   context,
   cors: true,
   introspection: true,
-  playground: true,
+  playground: config.playground,
   subscriptions: {
     onConnect: (connectionParams) => {
       if (connectionParams.token) {
@@ -62,17 +80,38 @@ const server = new ApolloServer({
 
 alarm.setAlarmState('DISARM')
 
-if (process.env.NODE_ENV !== 'test') {
-  server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-    console.log(`Launch time!!! ${url}`)
-  })
+const app = express()
+apollo.applyMiddleware({ app })
+
+var server
+if (config.ssl) {
+  server = https.createServer(
+    {
+      key: fs.readFileSync(`./ssl/${environment}/server.key`),
+      cert: fs.readFileSync(`./ssl/${environment}/server.cert`),
+    },
+    app
+  )
+} else {
+  server = http.createServer(app)
 }
+
+apollo.installSubscriptionHandlers(server)
+
+server.listen({ port: config.port }, () =>
+  console.log(
+    '🚀 Server ready at',
+    `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${
+      apollo.graphqlPath
+    }`
+  )
+)
 
 module.exports = {
   dataSources,
   typeDefs,
   resolvers,
-  ApolloServer,
+  apollo,
   store,
   server,
   context,
