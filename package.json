@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development nodemon"
+    "dev": "NODE_ENV=development nodemon -w src --exec \"node src\""
   },
   "repository": {
     "type": "git",
