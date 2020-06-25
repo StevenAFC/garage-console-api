@@ -18,7 +18,7 @@ class UserAPI extends DataSource {
     const user = await this.store.users.findOne({
       where: {
         email,
-        approved: 1,
+        approved: true,
       },
     })
 

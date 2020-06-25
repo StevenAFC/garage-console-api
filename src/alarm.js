@@ -11,8 +11,8 @@ class Alarm {
     this.setAlarmState('DISARMED')
     const inputDevices = await this.store.devices.findAll({
       where: {
-        input: 1,
-        alarmDevice: 1,
+        input: true,
+        alarmDevice: true,
       },
     })
 
@@ -62,8 +62,8 @@ class Alarm {
 
     const outputDevices = await this.store.devices.findAll({
       where: {
-        input: 0,
-        alarmDevice: 1,
+        input: false,
+        alarmDevice: true,
       },
     })
 
