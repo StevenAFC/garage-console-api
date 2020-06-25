@@ -1,10 +1,24 @@
 const { Sequelize } = require('sequelize')
 
 module.exports.createStore = () => {
-  const db = new Sequelize({
-    dialect: 'sqlite',
-    storage: './store.sqlite',
-  })
+  const db = new Sequelize(
+    process.env.DATABASE_NAME,
+    process.env.DATABASE_USER,
+    process.env.DATABASE_PASSWORD,
+    {
+      host: process.env.DATABASE_HOST,
+      port: process.env.DATABASE_PORT,
+      dialect: 'postgres',
+    }
+  )
+
+  db.authenticate()
+    .then(() => {
+      console.log('Connection has been established successfully.')
+    })
+    .catch((err) => {
+      console.log('Unable to connect to the database:', err)
+    })
 
   const users = db.define('user', {
     createdAt: Sequelize.DATE,

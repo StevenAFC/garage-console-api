@@ -6,6 +6,7 @@ const https = require('https')
 const http = require('http')
 const { ApolloServer } = require('apollo-server-express')
 const { RedisPubSub } = require('graphql-redis-subscriptions')
+const Redis = require('ioredis')
 
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
@@ -22,7 +23,16 @@ const PiManager = require('./pi-manager')
 const Alarm = require('./alarm')
 
 const store = createStore()
-const pubsub = new RedisPubSub()
+
+const pubsub = new RedisPubSub({
+  publisher: new Redis({
+    host: process.env.REDIS_DOMAIN_NAME,
+  }),
+  subscriber: new Redis({
+    host: process.env.REDIS_DOMAIN_NAME,
+  }),
+})
+
 const piManager = new PiManager({ pubsub, store })
 const alarm = new Alarm({ pubsub, store, piManager })
 alarm.initialise()
@@ -87,8 +97,8 @@ var server
 if (config.ssl) {
   server = https.createServer(
     {
-      key: fs.readFileSync(`./ssl/${environment}/server.key`),
-      cert: fs.readFileSync(`./ssl/${environment}/server.cert`),
+      // key: fs.readFileSync(`./ssl/${environment}/server.key`),
+      // cert: fs.readFileSync(`./ssl/${environment}/server.cert`),
     },
     app
   )
