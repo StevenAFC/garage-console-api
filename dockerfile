@@ -8,12 +8,10 @@ COPY src src
 #COPY package-lock.json .
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-
 COPY .env .
 
-EXPOSE 443
+# Install dependencies
+RUN npm install
 
 # Execute application
 CMD [ "node", "src/index.js" ]
