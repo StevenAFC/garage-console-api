@@ -1,5 +1,5 @@
 const { DataSource } = require('apollo-datasource')
-const { spawnSync } = require('child_process')
+const fs = require('fs').promises
 
 class PiApi extends DataSource {
   constructor({ piManager, store }) {
@@ -8,11 +8,20 @@ class PiApi extends DataSource {
     this.store = store
   }
 
-  readTemperature() {
-    var regex = /temp=([^'C]+)/
-    var cmd = spawnSync('/opt/vc/bin/vcgencmd', ['measure_temp'])
+  async readTemperature() {
+    var output
 
-    return cmd.stdout ? regex.exec(cmd.stdout.toString('utf8'))[1] : null
+    try {
+      output = await fs.readFile(
+        '/sys/class/thermal/thermal_zone0/temp',
+        'utf8'
+      )
+    } catch (e) {
+      console.log(e)
+      return 0
+    }
+
+    return Math.round((output / 1000) * 10) / 10
   }
 
   async getSystemStatus() {

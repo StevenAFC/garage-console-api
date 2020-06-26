@@ -19,7 +19,7 @@ const AtmosphereAPI = require('./datasources/atmosphere')
 const AlertAPI = require('./datasources/alert')
 const DeviceAPI = require('./datasources/device')
 const UserAPI = require('./datasources/user')
-const PiAPI = require('./datasources/pi')
+const PiAPI = require('./datasources/pi').default
 
 const PiManager = require('./pi-manager')
 const Alarm = require('./alarm')
