@@ -44,10 +44,10 @@ const context = ({ req, res }) => ({ req, res, pubsub })
 const configurations = {
   // Note: You may need sudo to run on port 443
   production: {
-    ssl: process.env.SSL,
-    port: process.env.PORT,
+    ssl: process.env.SSL === 'true',
+    port: parseInt(process.env.PORT),
     hostname: process.env.IP_ADDRESS,
-    playground: process.env.PLAYGROUND,
+    playground: process.env.PLAYGROUND === 'true',
   },
   development: {
     ssl: false,
