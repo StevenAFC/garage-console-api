@@ -42,10 +42,10 @@ const context = ({ req, res }) => ({ req, res, pubsub })
 const configurations = {
   // Note: You may need sudo to run on port 443
   production: {
-    ssl: true,
-    port: 443,
+    ssl: process.env.SSL,
+    port: process.env.PORT,
     hostname: process.env.IP_ADDRESS,
-    playground: true,
+    playground: process.env.PLAYGROUND,
   },
   development: {
     ssl: false,
@@ -92,6 +92,10 @@ alarm.setAlarmState('DISARM')
 
 const app = express()
 apollo.applyMiddleware({ app })
+
+app.get('/', (req, res) => {
+  res.send('<html><p>Moo</p></html>')
+})
 
 var server
 if (config.ssl) {
