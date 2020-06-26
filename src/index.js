@@ -1,7 +1,8 @@
 require('dotenv').config()
 
 const express = require('express')
-const fs = require('fs')
+const cors = require('cors')
+// const fs = require('fs')
 const https = require('https')
 const http = require('http')
 const { ApolloServer } = require('apollo-server-express')
@@ -92,6 +93,7 @@ alarm.setAlarmState('DISARM')
 
 const app = express()
 apollo.applyMiddleware({ app })
+app.use(cors())
 
 app.get('/', (req, res) => {
   res.send('<html><p>Moo</p></html>')
