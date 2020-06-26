@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const express = require('express')
+const morgan = require('morgan')
 const cors = require('cors')
 // const fs = require('fs')
 const https = require('https')
@@ -93,6 +94,8 @@ alarm.setAlarmState('DISARM')
 
 const app = express()
 apollo.applyMiddleware({ app })
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 app.use(cors())
 
 app.get('/', (req, res) => {
