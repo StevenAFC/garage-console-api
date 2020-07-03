@@ -1,9 +1,8 @@
 const Gpio = require('onoff').Gpio
 
 class PiManager {
-  constructor({ pubsub, store }) {
+  constructor({ pubsub }) {
     this.pubsub = pubsub
-    this.store = store
     this.devices = []
   }
 
