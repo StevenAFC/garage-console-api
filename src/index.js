@@ -102,18 +102,7 @@ app.get('/', (req, res) => {
   res.send('<html><p>Moo</p></html>')
 })
 
-var server
-if (config.ssl) {
-  server = https.createServer(
-    {
-      // key: fs.readFileSync(`./ssl/${environment}/server.key`),
-      // cert: fs.readFileSync(`./ssl/${environment}/server.cert`),
-    },
-    app
-  )
-} else {
-  server = http.createServer(app)
-}
+const server = http.createServer(app)
 
 apollo.installSubscriptionHandlers(server)
 
