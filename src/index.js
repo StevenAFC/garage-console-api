@@ -33,7 +33,7 @@ const pubsub = new RedisPubSub({
   }),
 })
 
-const piManager = new PiManager({ pubsub, store })
+const piManager = new PiManager({ pubsub })
 const alarm = new Alarm({ pubsub, store, piManager })
 alarm.initialise()
 const userAPI = new UserAPI({ store })

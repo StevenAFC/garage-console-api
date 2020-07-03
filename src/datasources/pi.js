@@ -7,11 +7,13 @@ class PiApi extends DataSource {
     this.piManager = piManager
     this.store = store
 
-    console.log('UPDATETING AASATMPOOSSHHERRE')
-    this.updateAtmosphere()
+    console.log(
+      'UPDATETING AASATMPOOSSHHERRE************************************************************************************************************************************************************'
+    )
+    //this.updateAtmosphere()
   }
 
-  getAtmposhere = new Promise((success, nosuccess) => {
+  /*getAtmposhere = new Promise((success, nosuccess) => {
     const { spawn } = require('child_process')
     const atmosScript = spawn('python3', ['~/pi/Temp.py'])
     atmosScript.stdout.on('data', (data) => {
@@ -28,7 +30,7 @@ class PiApi extends DataSource {
     this.getAtmposhere.then((data) => {
       console.log(data)
     })
-  }
+  }*/
 
   async readCpuTemperature() {
     var output
