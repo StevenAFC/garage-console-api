@@ -148,10 +148,11 @@ class PiManager {
     }
   }
 
+  // prettier-ignore
   consoleLog({ device, message, colour }) {
     device
       ? console.log(
-          '\u001b[' +
+        '\u001b[' +
             colour +
             'm' +
             'Device: ' +
@@ -161,7 +162,7 @@ class PiManager {
             ') ' +
             message +
             '\u001b[0m'
-        )
+      )
       : console.log('\u001b[' + colour + 'm' + message + '\u001b[0m')
   }
 }
