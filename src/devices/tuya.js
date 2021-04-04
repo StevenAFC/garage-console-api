@@ -6,6 +6,25 @@ class Tuya extends Service {
 
   async initialize() {
     this.devices.forEach((device) => {
+      this.connectToDevice({ device })
+    })
+  }
+
+  async devicePulse({ device }) {
+    const d = this.getDevice({ deviceId: device.id })
+
+    if (d.id === device.id) {
+      if (d.tuyaHook.isConnected()) {
+        d.tuyaHook.set({ set: !d.state })
+      } else {
+        console.log(d.name + ': Not currently connected to the Tuya device')
+        this.connectToDevice({ d })
+      }
+    }
+  }
+
+  connectToDevice({ device }) {
+    try {
       device.tuyaHook.find().then(() => device.tuyaHook.connect())
 
       device.tuyaHook.on('connected', () => {
@@ -20,16 +39,9 @@ class Tuya extends Service {
         this.updateState({ state: data.dps['1'], device })
         console.log('Data from device:', data)
       })
-    })
-  }
-
-  async devicePulse({ device }) {
-    this.devices.map((d) => {
-      if (d.id === device.id) {
-        console.log(d.state)
-        d.tuyaHook.set({ set: !d.state })
-      }
-    })
+    } catch (e) {
+      console.log('Unable to connect to device')
+    }
   }
 
   async addDevice({ device }) {
