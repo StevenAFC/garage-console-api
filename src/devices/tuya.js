@@ -17,29 +17,19 @@ class Tuya extends Service {
       })
 
       device.tuyaHook.on('data', (data) => {
-        this.updateState({ data })
+        this.updateState({ state: data.dps['1'], device })
         console.log('Data from device:', data)
       })
     })
   }
 
-  async updateState({ data }) {
-    this.devices = this.devices.map((d) => {
-      if (d.tuyaId === data.devId) d.state = data.dps['1']
+  async devicePulse({ device }) {
+    this.devices.map((d) => {
+      if (d.id === device.id) {
+        console.log(d.state)
+        d.tuyaHook.set({ set: !d.state })
+      }
     })
-
-    console.log('Devices:')
-    console.log(this.devices)
-
-    /*const device = this.devices.map((d) => {
-      if (d.tuyaId === data.devId) return d
-    })
-
-    console.log(device)*/
-
-    /*this.pubsub.publish('DEVICE_STATE', {
-      deviceState: this.device.find((d) => d.tuyaId == data.devId),
-    })*/
   }
 
   async addDevice({ device }) {

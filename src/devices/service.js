@@ -23,10 +23,11 @@ class Service {
   updateState({ device, state }) {
     this.devices = this.devices.map((d) => {
       if (d.id === device.id) d.state = state
+      return d
     })
 
     this.pubsub.publish('DEVICE_STATE', {
-      deviceState: this.getDevice({ device }),
+      deviceState: { id: device.id, state },
     })
   }
 
