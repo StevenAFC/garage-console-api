@@ -19,8 +19,6 @@ const DeviceAPI = require('./datasources/device')
 const UserAPI = require('./datasources/user')
 const PiAPI = require('./datasources/pi')
 
-// const PiManager = require('./pi-manager')
-const TuyaManager = require('./tuya-manager')
 const DeviceManager = require('./devices/device-manager')
 const Alarm = require('./alarm')
 
@@ -35,8 +33,6 @@ const pubsub = new RedisPubSub({
   }),
 })
 
-// const piManager = new PiManager({ pubsub, store })
-const tuyaManager = new TuyaManager({ pubsub, store })
 const deviceManager = new DeviceManager({ pubsub, store })
 const alarm = new Alarm({ pubsub, store, deviceManager })
 alarm.initialise()
