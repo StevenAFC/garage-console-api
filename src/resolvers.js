@@ -28,15 +28,15 @@ module.exports = {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       return await dataSources.piAPI.getSystemStatus()
     },
-    deviceStates: async (_, __, { req, dataSources }) => {
+    deviceStates: async (_, __, { req, dataSources, deviceManager }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await dataSources.piAPI.getDeviceStates()
+      return await deviceManager.getDeviceStates()
     },
   },
   Mutation: {
-    devicePulse: async (_, args, { req, dataSources }) => {
+    devicePulse: async (_, args, { req, dataSources, deviceManager }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await dataSources.piAPI.devicePulse(args.id)
+      return await deviceManager.devicePulse(args.id)
     },
     alarmState: async (_, args, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null

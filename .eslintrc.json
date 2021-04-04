@@ -15,6 +15,7 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
+    "linebreak-style": "windows",
     "comma-dangle": [
       "error",
       {

@@ -81,7 +81,7 @@ class PiManager {
 
   async toggle({ device }) {
     try {
-      this.initializeDevice({ device })
+      // this.initializeDevice({ device })
       const state = !this.getDevice({ device }).state
       this.write({ device, state })
       return true
@@ -108,7 +108,8 @@ class PiManager {
       } else {
         this.consoleLog({
           device,
-          message: 'pin cannot be set to high as the GPIO is inaccessible',
+          message:
+            'pin cannot be set to ' + state + ' as the GPIO is inaccessible',
           colour: 31,
         })
       }

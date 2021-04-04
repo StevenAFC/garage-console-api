@@ -19,7 +19,9 @@ const DeviceAPI = require('./datasources/device')
 const UserAPI = require('./datasources/user')
 const PiAPI = require('./datasources/pi')
 
-const PiManager = require('./pi-manager')
+// const PiManager = require('./pi-manager')
+const TuyaManager = require('./tuya-manager')
+const DeviceManager = require('./devices/device-manager')
 const Alarm = require('./alarm')
 
 const store = createStore()
@@ -33,11 +35,13 @@ const pubsub = new RedisPubSub({
   }),
 })
 
-const piManager = new PiManager({ pubsub, store })
-const alarm = new Alarm({ pubsub, store, piManager })
+// const piManager = new PiManager({ pubsub, store })
+const tuyaManager = new TuyaManager({ pubsub, store })
+const deviceManager = new DeviceManager({ pubsub, store })
+const alarm = new Alarm({ pubsub, store, deviceManager })
 alarm.initialise()
 const userAPI = new UserAPI({ store })
-const context = ({ req, res }) => ({ req, res, pubsub })
+const context = ({ req, res }) => ({ req, res, pubsub, deviceManager })
 
 const configurations = {
   // Note: You may need sudo to run on port 443
@@ -63,7 +67,7 @@ const dataSources = () => ({
   atmosphereAPI: new AtmosphereAPI({ store }),
   alertAPI: new AlertAPI({ store }),
   deviceAPI: new DeviceAPI({ store }),
-  piAPI: new PiAPI({ store, piManager }),
+  piAPI: new PiAPI({ store, deviceManager }),
   alarmAPI: new AlarmAPI({ store, alarm }),
 })
 

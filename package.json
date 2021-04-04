@@ -35,6 +35,7 @@
     "onoff": "^6.0.0",
     "pg": "^8.2.1",
     "sequelize": "^5.21.11",
+    "tuyapi": "github:codetheweb/tuyapi",
     "uuid": "^8.1.0"
   },
   "devDependencies": {

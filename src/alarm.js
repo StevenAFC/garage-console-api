@@ -1,8 +1,8 @@
 class Alarm {
-  constructor({ pubsub, store, piManager }) {
+  constructor({ pubsub, store, deviceManager }) {
     this.pubsub = pubsub
     this.store = store
-    this.piManager = piManager
+    this.deviceManager = deviceManager
     this.status = 'DISARMED'
   }
 
@@ -17,13 +17,16 @@ class Alarm {
     })
 
     inputDevices.map((device) => {
-      this.piManager.watchInputDevice({ device, cb: () => this.alert(device) })
+      this.deviceManager.watchInputDevice({
+        device,
+        cb: () => this.alert(device),
+      })
     })
   }
 
   async alert(device) {
     if (this.status === 'DISARMED') {
-      this.piManager.consoleLog({
+      this.consoleLog({
         device,
         message: 'has been triggered however the alarm is not armed',
         colour: 34,
@@ -32,7 +35,7 @@ class Alarm {
       return true
     }
 
-    this.piManager.consoleLog({
+    this.consoleLog({
       device,
       message: 'has been triggered',
       colour: 32,
@@ -55,7 +58,7 @@ class Alarm {
   }
 
   async triggerAlarm(state) {
-    this.piManager.consoleLog({
+    this.consoleLog({
       message: 'Alarm state changed to: ' + state,
       colour: 34,
     })
@@ -69,13 +72,13 @@ class Alarm {
 
     outputDevices &&
       outputDevices.map((device) => {
-        this.piManager.consoleLog({
+        this.consoleLog({
           device,
           message: 'Alarm Output Device',
           colour: 32,
         })
 
-        this.piManager.relayLatch({ device: device, state })
+        this.deviceManager.setState({ device: device, state })
       })
   }
 
@@ -106,7 +109,7 @@ class Alarm {
   alarmState(state) {
     this.status = state
 
-    this.piManager.consoleLog({
+    this.consoleLog({
       message: 'Alarm State has been changed to ' + state,
       colour: 32,
     })
@@ -126,7 +129,7 @@ class Alarm {
         this.refreshDevices()
         this.alarmState('DISARMED')
         this.triggerAlarm(0)
-        this.piManager.consoleLog({
+        this.consoleLog({
           device: null,
           message: 'Siren silenced ' + state,
           colour: 32,
@@ -142,6 +145,24 @@ class Alarm {
 
     return true
   }
+
+  // prettier-ignore
+  consoleLog({ device, message, colour }) {
+      device
+        ? console.log(
+          '\u001b[' +
+              colour +
+              'm' +
+              'Device: ' +
+              device.name +
+              ' (' +
+              device.deviceType +
+              ') ' +
+              message +
+              '\u001b[0m'
+        )
+        : console.log('\u001b[' + colour + 'm' + message + '\u001b[0m')
+    }
 }
 
 module.exports = Alarm

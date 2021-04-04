@@ -66,6 +66,9 @@ module.exports.createStore = () => {
     input: Sequelize.BOOLEAN,
     icon: Sequelize.STRING,
     color: Sequelize.STRING,
+    deviceType: Sequelize.STRING,
+    tuyaId: Sequelize.STRING,
+    tuyaKey: Sequelize.STRING,
   })
 
   alerts.belongsTo(devices, { foreignKey: 'deviceId' })

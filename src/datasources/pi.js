@@ -2,9 +2,10 @@ const { DataSource } = require('apollo-datasource')
 const fs = require('fs').promises
 
 class PiApi extends DataSource {
-  constructor({ piManager, store }) {
+  constructor({ piManager, tuyaManager, store }) {
     super()
     this.piManager = piManager
+    this.tuyaManager = tuyaManager
     this.store = store
   }
 
@@ -17,7 +18,7 @@ class PiApi extends DataSource {
         'utf8'
       )
     } catch (e) {
-      console.log(e)
+      // console.log(e)
       return 0
     }
 
@@ -47,14 +48,18 @@ class PiApi extends DataSource {
   async devicePulse(id) {
     const device = await this.store.devices.findByPk(id)
 
-    // if device duration is null we are assuming that the device is a toggle
-    if (device.duration === null) {
-      return await this.piManager.toggle({ device })
-    } else {
-      return await this.piManager.relayTrigger({
-        device: device,
-        duration: device.duration,
-      })
+    if (device.deviceType == 'RASPBERRY_PI') {
+      // if device duration is null we are assuming that the device is a toggle
+      if (device.duration === null) {
+        return await this.piManager.toggle({ device })
+      } else {
+        return await this.piManager.relayTrigger({
+          device: device,
+          duration: device.duration,
+        })
+      }
+    } else if (device.deviceType == 'TUYA') {
+      return await this.tuyaManager.toggle({ device })
     }
   }
 }

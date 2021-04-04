@@ -51,6 +51,12 @@ const typeDefs = gql`
     deviceId: ID!
     device: Device
   }
+
+  enum DeviceType {
+    RASPBERRY_PI
+    TUYA
+  }
+
   type Device {
     id: ID!
     createdAt: String!
@@ -66,6 +72,9 @@ const typeDefs = gql`
     input: Boolean
     color: String
     icon: String
+    deviceType: DeviceType
+    tuya_id: String
+    tuya_key: String
   }
 `
 
