@@ -93,7 +93,7 @@ class Pi extends Service {
   setState({ device, state }) {
     try {
       if (Gpio.accessible) {
-        this.getDevice({ device }).pin.writeSync(state ? 1 : 0)
+        this.getDevice({ device }).gpioHook.writeSync(state ? 1 : 0)
         this.updateState({ device, state })
 
         this.consoleLog({
@@ -118,7 +118,7 @@ class Pi extends Service {
     try {
       if (Gpio.accessible) {
         this.initializeDevice({ device })
-        this.getDevice({ device }).pin.watch(() => {
+        this.getDevice({ device }).gpioHook.watch(() => {
           cb()
         })
 
