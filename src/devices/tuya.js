@@ -41,6 +41,7 @@ class Tuya extends Service {
       })
     } catch (e) {
       console.log('Unable to connect to device')
+      console.log(e)
     }
   }
 
