@@ -80,9 +80,9 @@ class DeviceManager {
 
     switch (d.deviceType) {
       case 'RASPBERRY_PI':
-        return this.pi.watchInputDevice({ device, cb })
+        return this.pi.watchInputDevice({ device: d, cb })
       case 'TUYA':
-        return this.tuya.watchInputDevice({ device, cb })
+        return this.tuya.watchInputDevice({ device: d, cb })
     }
   }
 }

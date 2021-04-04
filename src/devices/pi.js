@@ -20,7 +20,7 @@ class Pi extends Service {
     this.devices.map((d) => {
       try {
         if (Gpio.accessible) {
-          this.updateState({ d, state: d.gpioHook.readSync() })
+          this.updateState({ device: d, state: d.gpioHook.readSync() })
         }
       } catch (e) {
         console.log(e)
@@ -42,8 +42,7 @@ class Pi extends Service {
 
   async toggle({ device }) {
     try {
-      // this.initializeDevice({ device })
-      const state = !this.getDevice({ device }).state
+      const state = !this.getDevice({ deviceId: device.id }).state
       this.setState({ device, state })
       return true
     } catch (e) {
@@ -58,12 +57,12 @@ class Pi extends Service {
 
   async relayTrigger({ device, duration }) {
     try {
-      const isActive = this.getDevice({ device })
-        ? this.getDevice({ device }).state
+      const isActive = this.getDevice({ deviceId: device.id })
+        ? this.getDevice({ deviceId: device.id }).state
         : false
 
       if (isActive) {
-        clearTimeout(this.getDevice({ device }).timeout)
+        clearTimeout(this.getDevice({ deviceId: device.id }).timeout)
         this.setState({ device, state: 0 })
         return true
       }
@@ -93,7 +92,9 @@ class Pi extends Service {
   setState({ device, state }) {
     try {
       if (Gpio.accessible) {
-        this.getDevice({ device }).gpioHook.writeSync(state ? 1 : 0)
+        this.getDevice({ deviceId: device.id }).gpioHook.writeSync(
+          state ? 1 : 0
+        )
         this.updateState({ device, state })
 
         this.consoleLog({
@@ -117,8 +118,7 @@ class Pi extends Service {
   async watchInputDevice({ device, cb }) {
     try {
       if (Gpio.accessible) {
-        this.initializeDevice({ device })
-        this.getDevice({ device }).gpioHook.watch(() => {
+        this.getDevice({ deviceId: device.id }).gpioHook.watch(() => {
           cb()
         })
 

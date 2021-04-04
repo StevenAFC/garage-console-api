@@ -14,9 +14,9 @@ class Service {
     return this.devices
   }
 
-  getDevice({ device }) {
-    this.devices.map((d) => {
-      if (d.id === device.id) return d
+  getDevice({ deviceId }) {
+    return this.devices.find((d) => {
+      return d.id === deviceId
     })
   }
 
