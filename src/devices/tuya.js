@@ -22,6 +22,8 @@ class Tuya extends Service {
   }
 
   connectToDevice({ device }) {
+    console.log(device.tuyaHook)
+
     try {
       device.tuyaHook.find().then(() => device.tuyaHook.connect())
 
