@@ -13,13 +13,11 @@ class Tuya extends Service {
   async devicePulse({ device }) {
     const d = this.getDevice({ deviceId: device.id })
 
-    if (d.id === device.id) {
-      if (d.tuyaHook.isConnected()) {
-        d.tuyaHook.set({ set: !d.state })
-      } else {
-        console.log(d.name + ': Not currently connected to the Tuya device')
-        this.connectToDevice({ d })
-      }
+    if (d.tuyaHook.isConnected()) {
+      d.tuyaHook.set({ set: !d.state })
+    } else {
+      console.log(d.name + ': Not currently connected to the Tuya device')
+      this.connectToDevice({ device: d })
     }
   }
 
