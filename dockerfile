@@ -13,5 +13,9 @@ RUN npm install
 COPY src src
 COPY .env .
 
+EXPOSE 6666
+EXPOSE 6667
+EXPOSE 6668
+
 # Execute application
 CMD [ "node", "src/index.js" ]
