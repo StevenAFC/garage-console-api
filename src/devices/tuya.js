@@ -30,7 +30,7 @@ class Tuya extends Service {
       })
 
       device.tuyaHook.on('disconnected', () => {
-        console.log('Disconnected from device.')
+        this.connectToDevice({ device })
       })
 
       device.tuyaHook.on('data', (data) => {
