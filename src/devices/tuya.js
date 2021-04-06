@@ -34,8 +34,13 @@ class Tuya extends Service {
       })
 
       device.tuyaHook.on('data', (data) => {
-        this.updateState({ state: data.dps['1'], device })
-        console.log('Data from device:', data)
+        try {
+          this.updateState({ state: data.dps['1'], device })
+          console.log('Data from device:', data)
+        } catch (e) {
+          console.log(data)
+          console.log(e)
+        }
       })
     } catch (e) {
       console.log('Unable to connect to device')
