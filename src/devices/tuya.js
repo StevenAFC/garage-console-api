@@ -33,10 +33,6 @@ class Tuya extends Service {
         console.log('Disconnected from device.')
       })
 
-      device.on('dp-refresh', (data) => {
-        console.log('DP_REFRESH data from device: ', data)
-      })
-
       device.tuyaHook.on('data', (data) => {
         try {
           this.updateState({ state: data.dps['1'], device })
@@ -56,7 +52,6 @@ class Tuya extends Service {
     const tuyaHook = new TuyAPI({
       id: device.tuyaId,
       key: device.tuyaKey,
-      issueRefreshOnConnect: true,
     })
 
     this.devices.push({ ...device.dataValues, tuyaHook, state: null })
