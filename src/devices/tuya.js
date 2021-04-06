@@ -15,9 +15,11 @@ class Tuya extends Service {
 
     if (d.tuyaHook.isConnected()) {
       d.tuyaHook.set({ set: !d.state })
+      return true
     } else {
       console.log(d.name + ': Not currently connected to the Tuya device')
       this.connectToDevice({ device: d })
+      return false
     }
   }
 
