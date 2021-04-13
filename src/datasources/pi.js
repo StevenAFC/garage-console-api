@@ -1,26 +1,22 @@
 const { DataSource } = require('apollo-datasource')
-const fs = require('fs').promises
+const si = require('systeminformation')
 
 class PiApi extends DataSource {
-  async readTemperature() {
-    var output
-
-    try {
-      output = await fs.readFile(
-        '/sys/class/thermal/thermal_zone0/temp',
-        'utf8'
-      )
-    } catch (e) {
-      // console.log(e)
-      return 0
-    }
-
-    return Math.round((output / 1000) * 10) / 10
-  }
-
   async getSystemStatus() {
-    return {
-      temp: this.readTemperature(),
+    try {
+      const cpuTemperature = await si.cpuTemperature()
+      const currentLoad = await si.currentLoad()
+      const mem = await si.mem()
+
+      return {
+        temp: Math.round(cpuTemperature.main),
+        totalMemory: mem.total,
+        usedMemory: mem.used,
+        cpuLoad: Math.round(currentLoad.currentLoad),
+      }
+    } catch (e) {
+      console.log(e)
+      return null
     }
   }
 }

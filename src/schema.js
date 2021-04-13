@@ -30,7 +30,10 @@ const typeDefs = gql`
     state: Boolean
   }
   type PiStatus {
-    temp: Float
+    temp: Int
+    totalMemory: Int
+    freeMemory: Int
+    cpuLoad: Int
   }
   type Subscription {
     alarmStatus: String
