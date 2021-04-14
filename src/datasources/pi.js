@@ -12,6 +12,7 @@ class PiApi extends DataSource {
         temp: Math.round(cpuTemperature.main),
         totalMemory: mem.total,
         usedMemory: mem.used,
+        freeMemory: mem.free,
         cpuLoad: Math.round(currentLoad.currentLoad),
       }
     } catch (e) {

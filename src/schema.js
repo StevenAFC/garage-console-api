@@ -33,6 +33,7 @@ const typeDefs = gql`
     temp: Int
     totalMemory: Int
     freeMemory: Int
+    usedMemory: Int
     cpuLoad: Int
   }
   type Subscription {
