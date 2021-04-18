@@ -21,14 +21,29 @@ class Service {
   }
 
   updateState({ device, state }) {
+    let stateChanged = false
+
     this.devices = this.devices.map((d) => {
-      if (d.id === device.id) d.state = state
+      if (d.id === device.id) {
+        if (d.state != state) {
+          d.state = state
+          stateChanged = true
+        }
+      }
       return d
     })
 
-    this.pubsub.publish('DEVICE_STATE', {
-      deviceState: { id: device.id, state },
-    })
+    if (stateChanged) {
+      this.pubsub.publish('DEVICE_STATE', {
+        deviceState: { id: device.id, state },
+      })
+
+      this.consoleLog({
+        device,
+        message: 'state has been changed to ' + state,
+        colour: 33,
+      })
+    }
   }
 
   async setState() {}

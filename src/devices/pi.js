@@ -7,7 +7,7 @@ class Pi extends Service {
   async addDevice({ device }) {
     let gpioHook = null
     if (Gpio.accessible) {
-      gpioHook = new Gpio(device.gpio, device.input ? 'in' : 'out', 'falling', {
+      gpioHook = new Gpio(device.gpio, device.input ? 'in' : 'out', 'both', {
         debounceTimeout: device.debounce,
         activeLow: device.inverted,
       })
@@ -21,6 +21,12 @@ class Pi extends Service {
       try {
         if (Gpio.accessible) {
           this.updateState({ device: d, state: d.gpioHook.readSync() })
+
+          if (d.input) {
+            d.gpioHook.watch((err, value) =>
+              this.updateState({ device: d, state: value })
+            )
+          }
         }
       } catch (e) {
         console.log(e)
