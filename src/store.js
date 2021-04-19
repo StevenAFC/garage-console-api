@@ -60,10 +60,6 @@ module.exports.createStore = () => {
     inverted: Sequelize.BOOLEAN,
     duration: Sequelize.INTEGER,
     alarmDevice: Sequelize.BOOLEAN,
-    alarmTriggered: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false,
-    },
     input: Sequelize.BOOLEAN,
     icon: Sequelize.STRING,
     color: Sequelize.STRING,

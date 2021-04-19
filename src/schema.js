@@ -71,7 +71,6 @@ const typeDefs = gql`
     inverted: Boolean
     duration: Int
     alarmDevice: Boolean
-    alarmTriggered: Boolean
     alerts: [Alert]
     input: Boolean
     color: String

@@ -6,14 +6,17 @@ class Pi extends Service {
 
   async addDevice({ device }) {
     let gpioHook = null
+    let state = false
     if (Gpio.accessible) {
       gpioHook = new Gpio(device.gpio, device.input ? 'in' : 'out', 'both', {
         debounceTimeout: device.debounce,
         activeLow: device.inverted,
       })
+
+      state = gpioHook.readSync()
     }
 
-    this.devices.push({ ...device.dataValues, gpioHook, state: false })
+    this.devices.push({ ...device.dataValues, gpioHook, state })
   }
 
   async initialize() {

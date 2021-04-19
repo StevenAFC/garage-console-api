@@ -5,6 +5,8 @@ class DeviceManager {
   constructor({ pubsub, store }) {
     this.store = store
 
+    this.pubsub = pubsub
+
     this.tuya = new Tuya({ pubsub })
     this.pi = new Pi({ pubsub })
 

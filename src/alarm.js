@@ -3,83 +3,43 @@ class Alarm {
     this.pubsub = pubsub
     this.store = store
     this.deviceManager = deviceManager
-    this.status = 'DISARMED'
-  }
+    this.state = 'DISARMED'
 
-  async initialise() {
-    console.log('Initialising alarm IO')
     this.setAlarmState('DISARMED')
-    const inputDevices = await this.store.devices.findAll({
-      where: {
-        input: true,
-        alarmDevice: true,
-      },
-    })
-
-    inputDevices.map((device) => {
-      this.deviceManager.watchInputDevice({
-        device,
-        cb: () => this.alert(device),
-      })
-    })
-  }
-
-  async alert(device) {
-    if (this.status === 'DISARMED') {
-      this.consoleLog({
-        device,
-        message: 'has been triggered however the alarm is not armed',
-        colour: 34,
-      })
-
-      return true
-    }
-
     this.consoleLog({
-      device,
-      message: 'has been triggered',
+      message: '🚨 Alarm state is set to DISARMED',
       colour: 32,
     })
 
-    this.store.alerts.create({
-      deviceId: device.id,
-    })
-
-    await this.store.devices.update(
-      { alarmTriggered: true },
-      { where: { id: device.id } }
-    )
-
-    this.refreshDevices()
-
-    this.triggerAlarm(1)
-
-    return true
+    this.pubsub.subscribe('DEVICE_STATE', (data) => this.alert(data))
   }
 
-  async triggerAlarm(state) {
-    this.consoleLog({
-      message: 'Alarm state changed to: ' + state,
-      colour: 34,
-    })
-
-    const outputDevices = await this.store.devices.findAll({
-      where: {
-        input: false,
-        alarmDevice: true,
-      },
-    })
-
-    outputDevices &&
-      outputDevices.map((device) => {
+  async alert({ device }) {
+    if (device.input && device.alarmDevice && device.state === 0) {
+      if (this.state != 'ARMED') {
         this.consoleLog({
           device,
-          message: 'Alarm Output Device',
-          colour: 32,
+          message: 'has been triggered however the alarm is not armed',
+          colour: 36,
         })
 
-        this.deviceManager.setState({ device: device, state })
+        return true
+      }
+
+      this.consoleLog({
+        device,
+        message: 'has been tripped',
+        colour: 31,
       })
+
+      this.store.alerts.create({
+        deviceId: device.id,
+      })
+
+      this.refreshDevices()
+
+      this.setAlarmState('ALERTED')
+    }
   }
 
   async refreshDevices() {
@@ -102,48 +62,83 @@ class Alarm {
     })
   }
 
-  getAlarmState() {
-    return this.status
+  triggerAlarm() {
+    this.consoleLog({
+      message: '🚨 Alarm has been triggered!!!',
+      colour: 31,
+    })
+
+    const outputDevices = this.deviceManager.getDevices().filter((d) => {
+      return d.alarmDevice && !d.input ? true : false
+    })
+
+    outputDevices.forEach((d) => {
+      this.deviceManager.setState({ device: d, state: true })
+    })
   }
 
-  alarmState(state) {
-    this.status = state
+  silenceAlarm() {
+    if (this.getState() === 'ALERTED') {
+      this.consoleLog({
+        message: '🚨 Alarm has been silenced',
+        colour: 36,
+      })
+
+      const outputDevices = this.deviceManager.getDevices().filter((d) => {
+        return d.alarmDevice && !d.input ? true : false
+      })
+
+      outputDevices.forEach((d) => {
+        this.deviceManager.setState({ device: d, state: false })
+      })
+    }
+  }
+
+  getState() {
+    return this.state
+  }
+
+  setState(state) {
+    this.state = state
 
     this.consoleLog({
       message: 'Alarm State has been changed to ' + state,
-      colour: 32,
+      colour: 36,
     })
 
     this.pubsub.publish('ALARM_STATUS', {
-      alarmStatus: this.status,
+      alarmStatus: this.state,
     })
   }
 
-  async setAlarmState(state) {
+  setAlarmState(state) {
     switch (state) {
-      case 'DISARM':
-        await this.store.devices.update(
-          { alarmTriggered: false },
-          { where: { alarmTriggered: true } }
-        )
-        this.refreshDevices()
-        this.alarmState('DISARMED')
-        this.triggerAlarm(0)
-        this.consoleLog({
-          device: null,
-          message: 'Siren silenced ' + state,
-          colour: 32,
-        })
+      case 'DISARMED':
+        this.silenceAlarm()
+        this.setState(state)
         break
-      case 'ARM':
-        this.alarmState('ARMED')
-        this.refreshDevices()
+      case 'ARMED':
+        this.setState(state)
+        break
+      case 'ALERTED':
+        this.triggerAlarm()
+        // turn alarm off automatically after 2 minutes
+        setTimeout(() => {
+          this.consoleLog({
+            message: 'Alarm has been disarmed automatically',
+            colour: 36,
+          })
+          this.setAlarmState('DISARMED')
+        }, 120000)
+        this.setState(state)
         break
       default:
-        return false
+        this.consoleLog({
+          message: 'Invalid alarm state: ' + state,
+          colour: 36,
+        })
+        break
     }
-
-    return true
   }
 
   // prettier-ignore
@@ -153,7 +148,7 @@ class Alarm {
           '\u001b[' +
               colour +
               'm' +
-              'Device: ' +
+              '🚨 Device: ' +
               device.name +
               ' (' +
               device.deviceType +

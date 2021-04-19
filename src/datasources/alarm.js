@@ -16,7 +16,7 @@ class AlarmAPI extends DataSource {
   }
 
   async getAlarmState() {
-    return this.alarm.getAlarmState()
+    return this.alarm.getState()
   }
 }
 

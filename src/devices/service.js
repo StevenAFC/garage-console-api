@@ -35,6 +35,7 @@ class Service {
 
     if (stateChanged) {
       this.pubsub.publish('DEVICE_STATE', {
+        device,
         deviceState: { id: device.id, state },
       })
 

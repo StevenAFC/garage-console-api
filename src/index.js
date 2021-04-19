@@ -36,7 +36,6 @@ const pubsub = new RedisPubSub({
 
 const deviceManager = new DeviceManager({ pubsub, store })
 const alarm = new Alarm({ pubsub, store, deviceManager })
-alarm.initialise()
 const userAPI = new UserAPI({ store })
 const context = ({ req, res }) => ({ req, res, pubsub, deviceManager })
 
@@ -89,8 +88,6 @@ const apollo = new ApolloServer({
   },
 })
 
-alarm.setAlarmState('DISARM')
-
 const app = express()
 apollo.applyMiddleware({ app })
 
@@ -98,7 +95,9 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 app.use(cors())
 
 app.get('/', (req, res) => {
-  res.send('<html><p>Moo</p></html>')
+  res.send(
+    '<html><p>Remember what your Mumma said, read the books your father read.</p></html>'
+  )
 })
 
 const server = http.createServer(app)
