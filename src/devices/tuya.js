@@ -40,7 +40,7 @@ class Tuya extends Service {
       })
 
       device.tuyaHook.on('disconnected', () => {
-        this.connectToDevice({ device })
+        setTimeout(() => this.connectToDevice({ device }), 2000)
       })
 
       device.tuyaHook.on('data', (data) => {
@@ -64,10 +64,6 @@ class Tuya extends Service {
 
     this.devices.push({ ...device.dataValues, tuyaHook, state: null })
   }
-
-  async getStates() {}
-
-  async getState({ device }) {}
 }
 
 module.exports = Tuya
