@@ -35,7 +35,16 @@ class Service {
 
     if (stateChanged) {
       this.pubsub.publish('DEVICE_STATE', {
-        device,
+        device: {
+          id: device.id,
+          name: device.name,
+          input: device.input,
+          alarmDevice: device.alarmDevice,
+          gpio: device.gpio,
+          icon: device.icon,
+          color: device.color,
+          deviceType: device.deviceType,
+        },
         deviceState: { id: device.id, state },
       })
 
