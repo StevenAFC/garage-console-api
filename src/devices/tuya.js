@@ -46,11 +46,11 @@ class Tuya extends Service {
 
       device.tuyaHook.on('disconnected', () => {
         console.log('Disconnected from ' + device.name)
-        this.reconnectToDevice({ device })
+        //this.reconnectToDevice({ device })
       })
 
       device.tuyaHook.on('error', (error) => {
-        console.log('Error on device:' + device.name + error.message)
+        //console.log('Error on device: ' + device.name + ' - ' + error.message)
         device.tuyaHook.disconnect()
       })
 
