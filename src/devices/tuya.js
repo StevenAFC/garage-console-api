@@ -31,16 +31,27 @@ class Tuya extends Service {
     }
   }
 
+  reconnectToDevice({ device }) {
+    console.log('Reconnecting to ' + device.name + ' in 5 seconds')
+    setTimeout(() => this.connectToDevice({ device }), 5000)
+  }
+
   connectToDevice({ device }) {
     try {
       device.tuyaHook.find().then(() => device.tuyaHook.connect())
 
       device.tuyaHook.on('connected', () => {
-        console.log('Connected to Tuya device!')
+        console.log('Connected to ' + device.name)
       })
 
       device.tuyaHook.on('disconnected', () => {
-        setTimeout(() => this.connectToDevice({ device }), 2000)
+        console.log('Disconnected from ' + device.name)
+        this.reconnectToDevice({ device })
+      })
+
+      device.tuyaHook.on('error', (error) => {
+        console.log('Error on device:' + device.name + error.message)
+        device.tuyaHook.disconnect()
       })
 
       device.tuyaHook.on('data', (data) => {
