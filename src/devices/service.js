@@ -44,6 +44,7 @@ class Service {
           icon: device.icon,
           color: device.color,
           deviceType: device.deviceType,
+          state: device.state,
         },
         deviceState: { id: device.id, state },
       })
