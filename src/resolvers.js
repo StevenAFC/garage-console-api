@@ -48,6 +48,9 @@ module.exports = {
     register: async (_, args, { dataSources }) => {
       return await dataSources.userAPI.register(args)
     },
+    subscribe: async (_, args, { dataSources }) => {
+      return await dataSources.subscriptionAPI.subscribe(args)
+    },
   },
   Subscription: {
     alarmStatus: {

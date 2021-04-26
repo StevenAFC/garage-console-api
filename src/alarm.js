@@ -1,8 +1,9 @@
 class Alarm {
-  constructor({ pubsub, store, deviceManager }) {
+  constructor({ pubsub, store, deviceManager, messages }) {
     this.pubsub = pubsub
     this.store = store
     this.deviceManager = deviceManager
+    this.messages = messages
     this.state = 'DISARMED'
 
     this.setAlarmState('DISARMED')
@@ -68,6 +69,11 @@ class Alarm {
       colour: 31,
     })
 
+    this.messages.sendMessage({
+      title: '🚨 Alarm',
+      message: 'Garage alarm has been triggered!!!',
+    })
+
     const outputDevices = this.deviceManager.getDevices().filter((d) => {
       return d.alarmDevice && !d.input ? true : false
     })
@@ -82,6 +88,11 @@ class Alarm {
       this.consoleLog({
         message: '🚨 Alarm has been silenced',
         colour: 36,
+      })
+
+      this.messages.sendMessage({
+        title: '🚨 Alarm',
+        message: 'Alarm has been silenced',
       })
 
       const outputDevices = this.deviceManager.getDevices().filter((d) => {
@@ -104,6 +115,11 @@ class Alarm {
     this.consoleLog({
       message: 'Alarm State has been changed to ' + state,
       colour: 36,
+    })
+
+    this.messages.sendMessage({
+      title: '🚨 Alarm state change',
+      message: 'Alarm State has been changed to ' + state,
     })
 
     this.pubsub.publish('ALARM_STATUS', {

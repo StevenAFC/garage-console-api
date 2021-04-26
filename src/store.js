@@ -37,6 +37,13 @@ module.exports.createStore = () => {
     },
   })
 
+  const subscriptions = db.define('subscription', {
+    createdAt: Sequelize.DATE,
+    endpoint: Sequelize.STRING,
+    p256dh: Sequelize.STRING,
+    auth: Sequelize.STRING,
+  })
+
   const atmospheres = db.define('atmosphere', {
     createdAt: Sequelize.DATE,
     temperature: Sequelize.FLOAT,
@@ -74,5 +81,5 @@ module.exports.createStore = () => {
 
   db.sync()
 
-  return { db, atmospheres, alerts, devices, users }
+  return { db, atmospheres, alerts, devices, users, subscriptions }
 }

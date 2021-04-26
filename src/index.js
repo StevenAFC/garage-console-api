@@ -8,6 +8,7 @@ const http = require('http')
 const { ApolloServer } = require('apollo-server-express')
 const { RedisPubSub } = require('graphql-redis-subscriptions')
 const Redis = require('ioredis')
+const webPush = require('web-push')
 
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
@@ -19,9 +20,11 @@ const AlertAPI = require('./datasources/alert')
 const DeviceAPI = require('./datasources/device')
 const UserAPI = require('./datasources/user')
 const PiAPI = require('./datasources/pi')
+const SubscriptionAPI = require('./datasources/subscription')
 
 const DeviceManager = require('./devices/device-manager')
 const Alarm = require('./alarm')
+const Messages = require('./messages')
 
 const store = createStore()
 
@@ -34,8 +37,20 @@ const pubsub = new RedisPubSub({
   }),
 })
 
+const vapidKeys = {
+  publicKey: process.env.VAPID_PUBLIC_KEY,
+  privateKey: process.env.VAPID_PRIVATE_KEY,
+}
+
+webPush.setVapidDetails(
+  'mailto:steven@beeching.me',
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+)
+
+const messages = new Messages({ store, webPush })
 const deviceManager = new DeviceManager({ pubsub, store })
-const alarm = new Alarm({ pubsub, store, deviceManager })
+const alarm = new Alarm({ pubsub, store, deviceManager, messages })
 const userAPI = new UserAPI({ store })
 const context = ({ req, res }) => ({ req, res, pubsub, deviceManager })
 
@@ -65,6 +80,7 @@ const dataSources = () => ({
   deviceAPI: new DeviceAPI({ store }),
   piAPI: new PiAPI({ store, deviceManager }),
   alarmAPI: new AlarmAPI({ store, alarm }),
+  subscriptionAPI: new SubscriptionAPI({ store }),
 })
 
 const apollo = new ApolloServer({
@@ -98,6 +114,37 @@ app.get('/', (req, res) => {
   res.send(
     '<html><p>Remember what your Mumma said, read the books your father read.</p></html>'
   )
+})
+
+app.get('/push', (req, res) => {
+  const sub = {
+    endpoint:
+      'https://fcm.googleapis.com/fcm/send/fcPSzs_1chM:APA91bGK7Gfw0mr6s2fx7J8hJWG1Ixx6_b2IhJbksLZ9D8bARvf9pFEsctuCMHMBhU5TJ0frPz4cTH-sa4sOCcECVZnKA5NtSDKs9JH-To5K6FHCU-klwSvwJ3Xlca2gr-ypJHM7-MzB',
+    expirationTime: null,
+    keys: {
+      p256dh:
+        'BAIPaGPG74zEiclhr2KgAFti2VWT6nJYyzha9PcmJMJDsaTnBo5D_lpBcFmfcQLRj68VCx07oD4uQESflx9ybSs',
+      auth: 'Ivx6yVl32p-8liend-W4hQ',
+    },
+  }
+
+  console.log('Sending notification chrome')
+
+  const payload = JSON.stringify({
+    title: 'Web Push End Point',
+    message: 'I love cats',
+  })
+
+  webPush
+    .sendNotification(sub, payload)
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
+  res.send('<html><p>Message sent</p></html>')
 })
 
 const server = http.createServer(app)

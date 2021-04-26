@@ -16,6 +16,7 @@ const typeDefs = gql`
     alarmState(state: String!): Boolean
     login(email: String!, password: String!): LoginResponse!
     register(email: String!, password: String!): Boolean
+    subscribe(endpoint: String!, p256dh: String!, auth: String!): Boolean
   }
   type LoginResponse {
     token: String
