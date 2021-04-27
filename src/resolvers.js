@@ -48,7 +48,8 @@ module.exports = {
     register: async (_, args, { dataSources }) => {
       return await dataSources.userAPI.register(args)
     },
-    subscribe: async (_, args, { dataSources }) => {
+    subscribe: async (_, args, { req, dataSources }) => {
+      if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       return await dataSources.subscriptionAPI.subscribe(args)
     },
   },
