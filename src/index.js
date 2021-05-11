@@ -116,37 +116,6 @@ app.get('/', (req, res) => {
   )
 })
 
-app.get('/push', (req, res) => {
-  const sub = {
-    endpoint:
-      'https://fcm.googleapis.com/fcm/send/fcPSzs_1chM:APA91bGK7Gfw0mr6s2fx7J8hJWG1Ixx6_b2IhJbksLZ9D8bARvf9pFEsctuCMHMBhU5TJ0frPz4cTH-sa4sOCcECVZnKA5NtSDKs9JH-To5K6FHCU-klwSvwJ3Xlca2gr-ypJHM7-MzB',
-    expirationTime: null,
-    keys: {
-      p256dh:
-        'BAIPaGPG74zEiclhr2KgAFti2VWT6nJYyzha9PcmJMJDsaTnBo5D_lpBcFmfcQLRj68VCx07oD4uQESflx9ybSs',
-      auth: 'Ivx6yVl32p-8liend-W4hQ',
-    },
-  }
-
-  console.log('Sending notification chrome')
-
-  const payload = JSON.stringify({
-    title: 'Web Push End Point',
-    message: 'I love cats',
-  })
-
-  webPush
-    .sendNotification(sub, payload)
-    .then((res) => {
-      console.log(res)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-
-  res.send('<html><p>Message sent</p></html>')
-})
-
 const server = http.createServer(app)
 
 apollo.installSubscriptionHandlers(server)
