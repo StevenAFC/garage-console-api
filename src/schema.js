@@ -79,6 +79,7 @@ const typeDefs = gql`
     deviceType: DeviceType
     tuya_id: String
     tuya_key: String
+    signal: String
   }
 `
 

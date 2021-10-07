@@ -1,5 +1,6 @@
 const Tuya = require('./tuya')
 const Pi = require('./pi')
+const Rf = require('./rf')
 
 class DeviceManager {
   constructor({ pubsub, store }) {
@@ -9,8 +10,9 @@ class DeviceManager {
 
     this.tuya = new Tuya({ pubsub })
     this.pi = new Pi({ pubsub })
+    this.rf = new Rf({ pubsub })
 
-    this.services = [this.tuya, this.pi]
+    this.services = [this.tuya, this.pi, this.rf]
 
     this.initialize()
   }
@@ -25,6 +27,9 @@ class DeviceManager {
           break
         case 'TUYA':
           this.tuya.addDevice({ device })
+          break
+        case 'RF':
+          this.rf.addDevice({ device })
           break
       }
     })
@@ -63,6 +68,8 @@ class DeviceManager {
         return this.pi.devicePulse({ device })
       case 'TUYA':
         return this.tuya.devicePulse({ device })
+      case 'RF':
+        return this.rf.devicePulse({ device })
     }
   }
 

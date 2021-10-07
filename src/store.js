@@ -73,6 +73,7 @@ module.exports.createStore = () => {
     deviceType: Sequelize.STRING,
     tuyaId: Sequelize.STRING,
     tuyaKey: Sequelize.STRING,
+    signal: Sequelize.STRING,
   })
 
   alerts.belongsTo(devices, { foreignKey: 'deviceId' })
