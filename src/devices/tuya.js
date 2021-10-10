@@ -9,7 +9,9 @@ class Tuya extends Service {
       try {
         this.connectToDevice({ device })
       } catch (e) {
-        console.log('Error initializing Tuya device: ' + device.name)
+        console.log(
+          'Error initializing Tuya device: ' + e.message + device.name
+        )
       }
     })
   }
@@ -22,12 +24,12 @@ class Tuya extends Service {
         d.tuyaHook.set({ set: !d.state })
         return true
       } else {
-        console.log(d.name + ': Not currently connected to the Tuya device')
+        //console.log(d.name + ': Not currently connected to the Tuya device')
         this.connectToDevice({ device: d })
         return false
       }
     } catch (e) {
-      console.log('Unable to connect to Tuya device')
+      console.log('Unable to connect to Tuya device: ' + e.message)
     }
   }
 
@@ -41,29 +43,31 @@ class Tuya extends Service {
       device.tuyaHook.find().then(() => device.tuyaHook.connect())
 
       device.tuyaHook.on('connected', () => {
-        console.log('Connected to ' + device.name)
+        //console.log('Connected to ' + device.name)
       })
 
       device.tuyaHook.on('disconnected', () => {
-        console.log('Disconnected from ' + device.name)
+        //console.log('Disconnected from ' + device.name)
         //this.reconnectToDevice({ device })
+        this.updateState({ state: null, device })
       })
 
       device.tuyaHook.on('error', (error) => {
-        //console.log('Error on device: ' + device.name + ' - ' + error.message)
+        console.log('Error on device: ' + device.name + ' - ' + error.message)
         device.tuyaHook.disconnect()
+        this.updateState({ state: null, device })
       })
 
       device.tuyaHook.on('data', (data) => {
         try {
           this.updateState({ state: data.dps['1'], device })
-          console.log('Data from Tuya device:', data)
+          //console.log('Data from Tuya device:', data)
         } catch (e) {
-          console.log(data)
+          console.log(data + e.message)
         }
       })
     } catch (e) {
-      console.log('Unable to connect to Tuya device')
+      console.log('Unable to connect to Tuya device: ' + e.message)
     }
   }
 
