@@ -17,7 +17,7 @@ class Alarm {
 
   async alert({ device }) {
     if (device.input && device.alarmDevice && device.state === 0) {
-      if (this.state != 'ARMED') {
+      if (this.state !== 'ARMED') {
         this.consoleLog({
           device,
           message: 'has been triggered however the alarm is not armed',
@@ -75,7 +75,7 @@ class Alarm {
     })
 
     const outputDevices = this.deviceManager.getDevices().filter((d) => {
-      return d.alarmDevice && !d.input ? true : false
+      return d.alarmDevice && !d.input
     })
 
     outputDevices.forEach((d) => {
@@ -96,7 +96,7 @@ class Alarm {
       })
 
       const outputDevices = this.deviceManager.getDevices().filter((d) => {
-        return d.alarmDevice && !d.input ? true : false
+        return d.alarmDevice && !d.input
       })
 
       outputDevices.forEach((d) => {
@@ -159,9 +159,9 @@ class Alarm {
 
   // prettier-ignore
   consoleLog({ device, message, colour }) {
-      device
-        ? console.log(
-          '\u001b[' +
+    device
+      ? console.log(
+        '\u001b[' +
               colour +
               'm' +
               '🚨 Device: ' +
@@ -171,9 +171,9 @@ class Alarm {
               ') ' +
               message +
               '\u001b[0m'
-        )
-        : console.log('\u001b[' + colour + 'm' + message + '\u001b[0m')
-    }
+      )
+      : console.log('\u001b[' + colour + 'm' + message + '\u001b[0m')
+  }
 }
 
 module.exports = Alarm

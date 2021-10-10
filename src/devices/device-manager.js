@@ -40,7 +40,7 @@ class DeviceManager {
   }
 
   getDevices() {
-    let devices = []
+    const devices = []
 
     this.services.map((service) => {
       devices.push(...service.getDevices())
