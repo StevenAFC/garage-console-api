@@ -34,6 +34,13 @@ class AtmosphereAPI extends DataSource {
       raw: true,
     })
   }
+
+  async getAtmosphere() {
+    return await this.store.atmospheres.findOne({
+      order: [['createdAt', 'DESC']],
+      raw: true,
+    })
+  }
 }
 
 module.exports = AtmosphereAPI

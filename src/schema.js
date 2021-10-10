@@ -2,6 +2,7 @@ const { gql } = require('apollo-server')
 
 const typeDefs = gql`
   type Query {
+    atmosphere: Atmosphere
     atmospheres: [Atmosphere]
     alerts: [Alert]
     devices: [Device]

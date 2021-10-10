@@ -1,5 +1,9 @@
 module.exports = {
   Query: {
+    atmosphere: async (_, __, { req, dataSources }) => {
+      if (!dataSources.userAPI.authenticate(req.headers.token)) return null
+      return await dataSources.atmosphereAPI.getAtmosphere()
+    },
     atmospheres: async (_, __, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       return await dataSources.atmosphereAPI.getAtmospheres()
