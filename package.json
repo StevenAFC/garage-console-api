@@ -33,7 +33,7 @@
     "onoff": "^6.0.3",
     "pg": "^8.7.1",
     "python-shell": "^3.0.1",
-    "sequelize": "^5.22.4",
+    "sequelize": "^6.7.0",
     "systeminformation": "^5.9.7",
     "tuyapi": "github:codetheweb/tuyapi",
     "web-push": "^3.4.5"
