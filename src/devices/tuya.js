@@ -9,9 +9,7 @@ class Tuya extends Service {
       try {
         this.connectToDevice({ device })
       } catch (e) {
-        console.log(
-          'Error initializing Tuya device: ' + e.message + device.name
-        )
+        console.log(`Error initializing Tuya ${device.name}: ${e.message}`)
       }
     })
   }
@@ -29,46 +27,51 @@ class Tuya extends Service {
         return false
       }
     } catch (e) {
-      console.log('Unable to connect to Tuya device: ' + e.message)
+      console.log(`Unable to connect to Tuya device: ${e.message}`)
     }
   }
 
   reconnectToDevice({ device }) {
-    console.log('Reconnecting to ' + device.name + ' in 5 seconds')
+    console.log(
+      `Reconnecting to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}) in 5 seconds`
+    )
     setTimeout(() => this.connectToDevice({ device }), 5000)
   }
 
   connectToDevice({ device }) {
-    try {
-      device.tuyaHook.find().then(() => device.tuyaHook.connect())
-
-      device.tuyaHook.on('connected', () => {
-        //console.log('Connected to ' + device.name)
+    device.tuyaHook
+      .find()
+      .then(() => device.tuyaHook.connect())
+      .catch((e) => {
+        console.log(
+          `Error connecting to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}): ${e.message}`
+        )
       })
 
-      device.tuyaHook.on('disconnected', () => {
-        //console.log('Disconnected from ' + device.name)
-        //this.reconnectToDevice({ device })
-        this.updateState({ state: null, device })
-      })
+    device.tuyaHook.on('connected', () => {
+      //console.log('Connected to ' + device.name)
+    })
 
-      device.tuyaHook.on('error', (error) => {
-        console.log('Error on device: ' + device.name + ' - ' + error.message)
-        device.tuyaHook.disconnect()
-        this.updateState({ state: null, device })
-      })
+    device.tuyaHook.on('disconnected', () => {
+      //console.log('Disconnected from ' + device.name)
+      //this.reconnectToDevice({ device })
+      this.updateState({ state: null, device })
+    })
 
-      device.tuyaHook.on('data', (data) => {
-        try {
-          this.updateState({ state: data.dps['1'], device })
-          //console.log('Data from Tuya device:', data)
-        } catch (e) {
-          console.log(data + e.message)
-        }
-      })
-    } catch (e) {
-      console.log('Unable to connect to Tuya device: ' + e.message)
-    }
+    device.tuyaHook.on('error', (error) => {
+      console.log(`Error on device: ${device.name} - ${error.message}`)
+      device.tuyaHook.disconnect()
+      this.updateState({ state: null, device })
+    })
+
+    device.tuyaHook.on('data', (data) => {
+      try {
+        this.updateState({ state: data.dps['1'], device })
+        //console.log('Data from Tuya device:', data)
+      } catch (e) {
+        console.log(data + e.message)
+      }
+    })
   }
 
   async addDevice({ device }) {
