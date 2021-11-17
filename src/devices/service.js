@@ -1,3 +1,5 @@
+const mqtt = require('mqtt')
+
 class Service {
   deviceType = null
 
@@ -47,6 +49,26 @@ class Service {
           state: device.state,
         },
         deviceState: { id: device.id, state },
+      })
+
+      var client = mqtt.connect('mqtt://192.168.86.34', {
+        username: process.env.MQTT_USERNAME,
+        password: process.env.MQTT_PASSWORD,
+      })
+
+      client.on('connect', function () {
+        client.publish(
+          `lakeside/garage/${device.name}`
+            .replace(/\s/g, '')
+            .toLocaleLowerCase(),
+          String(device.state)
+        )
+        client.end()
+      })
+
+      client.on('error', function (e) {
+        console.log(e)
+        client.end()
       })
 
       this.consoleLog({
