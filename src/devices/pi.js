@@ -70,11 +70,29 @@ class Pi extends Service {
         ? this.getDevice({ deviceId: device.id }).state
         : false
 
-      if (isActive) {
+      /*if (isActive) {
         clearTimeout(this.getDevice({ deviceId: device.id }).timeout)
         this.setState({ device, state: 0 })
         return true
+      }*/
+
+      // This just cancels all active devices to prevent the garage door screwing up.
+      // Ideally it would only cancel specific devices, but... this works for me for now.
+
+      const activeDevices = this.getDevices().filter((d) => {
+        if (d.duration !== null && d.state === 1) return d
+      })
+
+      if (activeDevices.length > 0) {
+        activeDevices.forEach((d) => {
+          clearTimeout(d.timeout)
+          this.setState({ device: d, state: 0 })
+        })
+
+        return true
       }
+
+      // End of hack
 
       this.setState({ device, state: 1 })
 
