@@ -6,6 +6,7 @@ const typeDefs = gql`
     atmospheres: [Atmosphere]
     alerts: [Alert]
     devices: [Device]
+    deviceState(id: ID!): Boolean
     deviceStates: [DeviceStatus]
     alarmDevices: [Device]
     alarmStatus: String!

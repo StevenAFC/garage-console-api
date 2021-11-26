@@ -39,6 +39,16 @@ class DeviceManager {
     })
   }
 
+  getDevice({ id }) {
+    const devices = []
+
+    this.services.map((service) => {
+      devices.push(...service.getDevices())
+    })
+
+    return devices.find((d) => d.id == id)
+  }
+
   getDevices() {
     const devices = []
 
@@ -58,6 +68,11 @@ class DeviceManager {
         state: { id: d.id, state: d.state },
       }
     })
+  }
+
+  async getDeviceState({ id }) {
+    const device = this.getDevice({ id })
+    return device.state
   }
 
   async devicePulse(id) {
