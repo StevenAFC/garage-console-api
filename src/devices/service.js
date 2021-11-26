@@ -51,7 +51,7 @@ class Service {
         deviceState: { id: device.id, state },
       })
 
-      var client = mqtt.connect('mqtt://192.168.86.34', {
+      var client = mqtt.connect(`mqtt://${process.env.MQTT_HOST}`, {
         username: process.env.MQTT_USERNAME,
         password: process.env.MQTT_PASSWORD,
       })
