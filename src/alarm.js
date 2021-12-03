@@ -72,6 +72,7 @@ class Alarm {
     this.messages.sendMessage({
       title: '🚨 Alarm',
       message: 'Garage alarm has been triggered!!!',
+      tag: 'alarm-triggered',
     })
 
     const outputDevices = this.deviceManager.getDevices().filter((d) => {
@@ -93,6 +94,7 @@ class Alarm {
       this.messages.sendMessage({
         title: '🚨 Alarm',
         message: 'Alarm has been silenced',
+        tag: 'alarm-triggered',
       })
 
       const outputDevices = this.deviceManager.getDevices().filter((d) => {
@@ -120,6 +122,7 @@ class Alarm {
     this.messages.sendMessage({
       title: '🚨 Alarm state change',
       message: 'Alarm State has been changed to ' + state,
+      tag: 'alarm-state-change',
     })
 
     this.pubsub.publish('ALARM_STATUS', {

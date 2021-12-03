@@ -4,10 +4,11 @@ class Messages {
     this.webPush = webPush
   }
 
-  async sendMessage({ title, message }) {
+  async sendMessage({ title, message, tag }) {
     const payload = JSON.stringify({
       title,
       message,
+      tag,
     })
 
     const subscriptions = await this.store.subscriptions.findAll()
