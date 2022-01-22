@@ -3,14 +3,14 @@ const Pi = require('./pi')
 const Rf = require('./rf')
 
 class DeviceManager {
-  constructor({ pubsub, store }) {
+  constructor({ pubsub, store, mqtt }) {
     this.store = store
 
     this.pubsub = pubsub
 
-    this.tuya = new Tuya({ pubsub })
-    this.pi = new Pi({ pubsub })
-    this.rf = new Rf({ pubsub })
+    this.tuya = new Tuya({ pubsub, mqtt })
+    this.pi = new Pi({ pubsub, mqtt })
+    this.rf = new Rf({ pubsub, mqtt })
 
     this.services = [this.tuya, this.pi, this.rf]
 
@@ -20,7 +20,7 @@ class DeviceManager {
   async initialize() {
     const devices = await this.store.devices.findAll()
 
-    devices.map((device) => {
+    devices.forEach((device) => {
       switch (device.deviceType) {
         case 'RASPBERRY_PI':
           this.pi.addDevice({ device })
@@ -34,7 +34,7 @@ class DeviceManager {
       }
     })
 
-    this.services.map((service) => {
+    this.services.forEach((service) => {
       service.initialize()
     })
   }
@@ -42,17 +42,17 @@ class DeviceManager {
   getDevice({ id }) {
     const devices = []
 
-    this.services.map((service) => {
+    this.services.forEach((service) => {
       devices.push(...service.getDevices())
     })
 
-    return devices.find((d) => d.id == id)
+    return devices.find((d) => d.id === id)
   }
 
   getDevices() {
     const devices = []
 
-    this.services.map((service) => {
+    this.services.forEach((service) => {
       devices.push(...service.getDevices())
     })
 

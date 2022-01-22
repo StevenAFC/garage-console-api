@@ -26,7 +26,11 @@ const DeviceManager = require('./devices/device-manager')
 const Alarm = require('./alarm')
 const Messages = require('./messages')
 
+const Mqtt = require('./mqtt')
+
 const store = createStore()
+
+const mqtt = new Mqtt()
 
 const pubsub = new RedisPubSub({
   publisher: new Redis({
@@ -49,7 +53,7 @@ webPush.setVapidDetails(
 )
 
 const messages = new Messages({ store, webPush })
-const deviceManager = new DeviceManager({ pubsub, store })
+const deviceManager = new DeviceManager({ pubsub, store, mqtt })
 const alarm = new Alarm({ pubsub, store, deviceManager, messages })
 const userAPI = new UserAPI({ store })
 const context = ({ req, res }) => ({ req, res, pubsub, deviceManager })
@@ -75,7 +79,7 @@ const config = configurations[environment]
 
 const dataSources = () => ({
   userAPI,
-  atmosphereAPI: new AtmosphereAPI({ store }),
+  atmosphereAPI: new AtmosphereAPI({ store, mqtt }),
   alertAPI: new AlertAPI({ store }),
   deviceAPI: new DeviceAPI({ store }),
   piAPI: new PiAPI({ store, deviceManager }),

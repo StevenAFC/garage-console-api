@@ -3,7 +3,6 @@ const { gql } = require('apollo-server')
 const typeDefs = gql`
   type Query {
     atmosphere: Atmosphere
-    atmospheres: [Atmosphere]
     alerts: [Alert]
     devices: [Device]
     deviceState(id: ID!): Boolean
@@ -45,11 +44,8 @@ const typeDefs = gql`
     deviceState: DeviceState
   }
   type Atmosphere {
-    id: ID!
     temperature: Float!
     humidity: Float!
-    createdAt: String!
-    updatedAt: String!
   }
   type Alert {
     id: ID!

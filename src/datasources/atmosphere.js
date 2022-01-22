@@ -1,45 +1,25 @@
 const { DataSource } = require('apollo-datasource')
-const { Op, Sequelize } = require('sequelize')
-const moment = require('moment')
 
 class AtmosphereAPI extends DataSource {
-  constructor({ store }) {
+  constructor({ store, mqtt }) {
     super()
     this.store = store
+    this.mqtt = mqtt
+    this.topic = process.env.MQTT_ENVIRONMENTAL_TOPIC
   }
 
   initialize(config) {
     this.context = config.context
-  }
-
-  async getAtmospheres() {
-    return await this.store.atmospheres.findAll({
-      where: {
-        createdAt: {
-          [Op.gte]: moment().subtract(7, 'days').toDate(),
-        },
-      },
-      attributes: {
-        include: [
-          [Sequelize.fn('AVG', Sequelize.col('temperature')), 'temperature'],
-          [Sequelize.fn('AVG', Sequelize.col('humidity')), 'humidity'],
-          [
-            Sequelize.fn('date_trunc', 'hour', Sequelize.col('createdAt')),
-            'createdAt',
-          ],
-        ],
-        exclude: ['id', 'createdAt', 'updatedAt', 'temperature', 'humidity'],
-      },
-      group: 'createdAt',
-      raw: true,
-    })
+    this.mqtt.subscribe(this.topic)
   }
 
   async getAtmosphere() {
-    return await this.store.atmospheres.findOne({
-      order: [['createdAt', 'DESC']],
-      raw: true,
-    })
+    const atmosphere = JSON.parse(this.mqtt.getLast(this.topic))
+
+    return {
+      temperature: atmosphere ? atmosphere.temperature : 0,
+      humidity: atmosphere ? atmosphere.humidity : 0,
+    }
   }
 }
 

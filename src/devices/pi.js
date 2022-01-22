@@ -2,7 +2,10 @@ const Service = require('./service')
 const Gpio = require('onoff').Gpio
 
 class Pi extends Service {
-  deviceType = 'RASPBERRY_PI'
+  constructor({ pubsub, mqtt }) {
+    super({ pubsub, mqtt })
+    this.deviceType = 'RASPBERRY_PI'
+  }
 
   async addDevice({ device }) {
     let gpioHook = null
@@ -20,7 +23,7 @@ class Pi extends Service {
   }
 
   async initialize() {
-    this.devices.map((d) => {
+    this.devices.forEach((d) => {
       try {
         if (Gpio.accessible) {
           this.updateState({ device: d, state: d.gpioHook.readSync() })
@@ -66,15 +69,15 @@ class Pi extends Service {
 
   async relayTrigger({ device, duration }) {
     try {
-      const isActive = this.getDevice({ deviceId: device.id })
+      /* const isActive = this.getDevice({ deviceId: device.id })
         ? this.getDevice({ deviceId: device.id }).state
-        : false
+        : false */
 
-      /*if (isActive) {
+      /* if (isActive) {
         clearTimeout(this.getDevice({ deviceId: device.id }).timeout)
         this.setState({ device, state: 0 })
         return true
-      }*/
+      } */
 
       // This just cancels all active devices to prevent the garage door screwing up.
       // Ideally it would only cancel specific devices, but... this works for me for now.
