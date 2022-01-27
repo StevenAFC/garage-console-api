@@ -46,7 +46,7 @@ class DeviceManager {
       devices.push(...service.getDevices())
     })
 
-    return devices.find((d) => d.id === id)
+    return devices.find((d) => d.id == id)
   }
 
   getDevices() {
