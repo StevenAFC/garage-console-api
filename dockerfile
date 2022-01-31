@@ -1,21 +1,18 @@
-FROM node:lts
+FROM node:latest
 
 # Set work directory to /app
 WORKDIR /app
 
 #COPY package-lock.json .
-COPY package*.json ./
+COPY ["package.json", "package-lock.json*", "./"]
 
 # Install dependencies
-RUN npm install
+RUN npm install --production
 
 # Copy required files to build application
 COPY src src
-COPY .env .
 
-EXPOSE 6666
-EXPOSE 6667
-EXPOSE 6668
+EXPOSE 4000
 
 # Execute application
 CMD [ "node", "src/index.js" ]

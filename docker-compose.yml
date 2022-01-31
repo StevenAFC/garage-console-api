@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+
+  redis:
+    image: "redis:latest"
+    restart: always
+    ports: 
+      - 6379:6379
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - redis
+
+  garage-api:
+    # restart: always
+    ports: 
+      - 4000:4000
+    privileged: true
+    build:
+      context: .
+      dockerfile: dockerfile
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - SECRET=${SECRET}
+      - SALT_ROUNDS=${SECRET}
+      - IP_ADDRESS=${IP_ADDRESS}
+      - PORT=${PORT}
+      - SSL=${SSL}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - REDIS_DOMAIN_NAME=${REDIS_DOMAIN_NAME}
+      - VAPID_SUBJECT=${VAPID_SUBJECT}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - MQTT_HOST=${MQTT_HOST}
+      - MQTT_PORT=${MQTT_PORT}
+      - MQTT_TOPIC_PREFIX=${MQTT_TOPIC_PREFIX}
+      - MQTT_ENVIRONMENTAL_TOPIC=${MQTT_ENVIRONMENTAL_TOPIC}
+    depends_on:
+      postgres:
+          condition: service_healthy
