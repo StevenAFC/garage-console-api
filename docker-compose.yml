@@ -28,7 +28,7 @@ services:
       - redis
 
   garage-api:
-    # restart: always
+    restart: always
     ports: 
       - 4000:4000
     privileged: true
@@ -38,7 +38,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV}
       - SECRET=${SECRET}
-      - SALT_ROUNDS=${SECRET}
+      - SALT_ROUNDS=${SALT_ROUNDS}
       - IP_ADDRESS=${IP_ADDRESS}
       - PORT=${PORT}
       - SSL=${SSL}
