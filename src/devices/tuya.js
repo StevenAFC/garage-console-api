@@ -13,7 +13,7 @@ class Tuya extends Service {
         this.connectToDevice({ device })
       } catch (e) {
         console.log(
-          `Tuya: Error initializing Tuya ${device.name}: ${e.message}`
+          `Tuya: Error initializing Tuya  ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}: ${e.message}`
         )
       }
     })
@@ -27,12 +27,11 @@ class Tuya extends Service {
         d.tuyaHook.set({ set: !d.state })
         return true
       } else {
-        // console.log(d.name + ': Not currently connected to the Tuya device')
         this.connectToDevice({ device: d })
         return false
       }
     } catch (e) {
-      console.log(`Tuya: Unable to connect to Tuya device: ${e.message}`)
+      console.log(`Tuya: Unable to connect to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}: ${e.message}`)
     }
   }
 
@@ -54,17 +53,21 @@ class Tuya extends Service {
       })
 
     device.tuyaHook.on('connected', () => {
-      // console.log('Connected to ' + device.name)
+      console.log(
+        `Tuya: Connected to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey})`
+      )
     })
 
     device.tuyaHook.on('disconnected', () => {
-      // console.log('Disconnected from ' + device.name)
+      console.log(
+        `Tuya: Disconnected from ${device.name} (id:${device.tuyaId} key:${device.tuyaKey})`
+      )
       // this.reconnectToDevice({ device })
       this.updateState({ state: null, device })
     })
 
-    device.tuyaHook.on('error', (error) => {
-      console.log(`Tuya: Error on device: ${device.name} - ${error.message}`)
+    device.tuyaHook.on('error', (e) => {
+      console.log(`Tuya: Error on device: ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}): ${e.message}`)
       device.tuyaHook.disconnect()
       this.updateState({ state: null, device })
     })
@@ -73,7 +76,7 @@ class Tuya extends Service {
       try {
         this.updateState({ state: data.dps['1'], device })
       } catch (e) {
-        console.log(`Tuya: Error receiving data - ${e.message}`)
+        console.log(`Tuya: Error receiving data ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}): ${e.message}`)
       }
     })
   }

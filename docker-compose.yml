@@ -31,7 +31,10 @@ services:
     restart: always
     ports: 
       - 4000:4000
+      - 6667:6667/udp
     privileged: true
+    volumes:
+      - /usr/lib/python3/dist-packages/RPi:/usr/lib/python3/dist-packages/RPi
     build:
       context: .
       dockerfile: dockerfile
