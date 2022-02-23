@@ -75,7 +75,7 @@ class DeviceManager {
     })
   }
 
-  async getDeviceState({ id }) {
+  getDeviceState({ id }) {
     const device = this.getDevice({ id })
     return device.state
   }

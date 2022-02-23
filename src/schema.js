@@ -6,7 +6,6 @@ const typeDefs = gql`
     alerts: [Alert]
     devices(input: Boolean, alarmDevice: Boolean): [Device]
     deviceState(id: ID!): Boolean
-    deviceStates: [DeviceStatus]
     alarmStatus: String!
     piStatus: PiStatus
   }
@@ -17,17 +16,14 @@ const typeDefs = gql`
     register(email: String!, password: String!): Boolean
     subscribe(endpoint: String!, p256dh: String!, auth: String!): Boolean
   }
+  type Subscription {
+    alarmStatus: String
+    alarmDevices: [Device]
+    deviceState: Device
+  }
   type LoginResponse {
     token: String
     success: Boolean
-  }
-  type DeviceStatus {
-    device: Device
-    state: DeviceState
-  }
-  type DeviceState {
-    id: Int!
-    state: Boolean
   }
   type PiStatus {
     temp: Float
@@ -35,11 +31,6 @@ const typeDefs = gql`
     freeMemory: Float
     usedMemory: Float
     cpuLoad: Float
-  }
-  type Subscription {
-    alarmStatus: String
-    alarmDevices: [Device]
-    deviceState: DeviceState
   }
   type Atmosphere {
     temperature: Float!
@@ -52,12 +43,10 @@ const typeDefs = gql`
     deviceId: ID!
     device: Device
   }
-
   enum DeviceType {
     RASPBERRY_PI
     TUYA
   }
-
   type Device {
     id: ID!
     createdAt: String!
@@ -74,6 +63,7 @@ const typeDefs = gql`
     icon: String
     deviceType: DeviceType
     config: String
+    state: Boolean
   }
 `
 

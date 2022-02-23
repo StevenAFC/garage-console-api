@@ -8,9 +8,19 @@ module.exports = {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       return await dataSources.alertAPI.getAlerts()
     },
-    devices: async (_, args, { req, dataSources }) => {
+    devices: async (_, args, { req, dataSources, deviceManager }) => {
+      console.log('mook')
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       let results = await dataSources.deviceAPI.getDevices()
+
+      results = results.map((d) => {
+        return {
+          ...d.dataValues,
+          state: deviceManager.getDeviceState({ id: d.id }),
+        }
+      })
+
+      console.log(results)
 
       if (args.input !== undefined) {
         results = results.filter((r) => r.input === args.input)
@@ -29,10 +39,6 @@ module.exports = {
     piStatus: async (_, __, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       return await dataSources.piAPI.getSystemStatus()
-    },
-    deviceStates: async (_, __, { req, dataSources, deviceManager }) => {
-      if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await deviceManager.getDeviceStates()
     },
     deviceState: async (_, args, { req, dataSources, deviceManager }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
@@ -68,6 +74,9 @@ module.exports = {
     },
     deviceState: {
       subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('DEVICE_STATE'),
+      resolve: (payload) => {
+        return payload
+      },
     },
   },
 }

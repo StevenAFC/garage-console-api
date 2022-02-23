@@ -12,10 +12,14 @@ class Alarm {
       colour: 32,
     })
 
-    this.pubsub.subscribe('DEVICE_STATE', (data) => this.alert(data))
+    this.pubsub.subscribe('DEVICE_STATE', (data) =>
+      this.alert({ device: data })
+    )
   }
 
-  async alert({ device }) {
+  alert({ device }) {
+    device = this.deviceManager.getDevice({ id: device.id })
+
     if (device.input && device.alarmDevice && device.state === 0) {
       if (this.state !== 'ARMED') {
         this.consoleLog({

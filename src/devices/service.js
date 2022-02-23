@@ -35,18 +35,8 @@ class Service {
 
     if (stateChanged) {
       this.pubsub.publish('DEVICE_STATE', {
-        device: {
-          id: device.id,
-          name: device.name,
-          input: device.input,
-          alarmDevice: device.alarmDevice,
-          gpio: device.gpio,
-          icon: device.icon,
-          color: device.color,
-          deviceType: device.deviceType,
-          state: device.state,
-        },
-        deviceState: { id: device.id, state },
+        id: device.id,
+        state: device.state,
       })
 
       this.mqtt.publish({
