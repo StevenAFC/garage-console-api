@@ -77,6 +77,8 @@ class DeviceManager {
 
   async getDeviceState({ id }) {
     const device = this.getDevice({ id })
+    console.log('mook')
+    console.log(device)
     return device.state
   }
 
