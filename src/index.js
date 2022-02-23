@@ -31,114 +31,120 @@ const Mqtt = require('./mqtt')
 const environment = process.env.NODE_ENV || 'development'
 console.log('Environment: ' + environment)
 
-const mqtt = new Mqtt()
-
-const pubsub = new RedisPubSub({
-  publisher: new Redis({
-    host: process.env.REDIS_DOMAIN_NAME,
-  }),
-  subscriber: new Redis({
-    host: process.env.REDIS_DOMAIN_NAME,
-  }),
-})
-
-webPush.setVapidDetails(
-  process.env.VAPID_SUBJECT,
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-)
-
 const store = createStore()
-const { db } = store
+const { sequalize } = store
 
-db.sync()
+sequalize
+  .sync({ force: true })
+  .then(() => {
+    const mqtt = new Mqtt()
 
-const messages = new Messages({ store, webPush })
-const deviceManager = new DeviceManager({ pubsub, store, mqtt })
-const alarm = new Alarm({ pubsub, store, deviceManager, messages })
-const userAPI = new UserAPI({ store })
-const context = ({ req, res }) => ({ req, res, pubsub, deviceManager })
+    const pubsub = new RedisPubSub({
+      publisher: new Redis({
+        host: process.env.REDIS_DOMAIN_NAME,
+      }),
+      subscriber: new Redis({
+        host: process.env.REDIS_DOMAIN_NAME,
+      }),
+    })
 
-const configurations = {
-  // Note: You may need sudo to run on port 443
-  production: {
-    ssl: process.env.SSL === 'true',
-    port: parseInt(process.env.PORT),
-    hostname: process.env.IP_ADDRESS,
-    playground: false,
-  },
-  development: {
-    ssl: false,
-    port: 4000,
-    hostname: 'localhost',
-    playground: true,
-  },
-}
+    webPush.setVapidDetails(
+      process.env.VAPID_SUBJECT,
+      process.env.VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    )
 
-const config = configurations[environment]
+    const messages = new Messages({ store, webPush })
+    const deviceManager = new DeviceManager({ pubsub, store, mqtt })
+    const alarm = new Alarm({ pubsub, store, deviceManager, messages })
+    const userAPI = new UserAPI({ store })
+    const context = ({ req, res }) => ({ req, res, pubsub, deviceManager })
 
-const dataSources = () => ({
-  userAPI,
-  atmosphereAPI: new AtmosphereAPI({ store, mqtt }),
-  alertAPI: new AlertAPI({ store }),
-  deviceAPI: new DeviceAPI({ store }),
-  piAPI: new PiAPI({ store, deviceManager }),
-  alarmAPI: new AlarmAPI({ store, alarm }),
-  subscriptionAPI: new SubscriptionAPI({ store }),
-})
+    const configurations = {
+      // Note: You may need sudo to run on port 443
+      production: {
+        ssl: process.env.SSL === 'true',
+        port: parseInt(process.env.PORT),
+        hostname: process.env.IP_ADDRESS,
+        playground: false,
+      },
+      development: {
+        ssl: false,
+        port: 4000,
+        hostname: 'localhost',
+        playground: true,
+      },
+    }
 
-const apollo = new ApolloServer({
-  typeDefs,
-  resolvers,
-  dataSources,
-  context,
-  cors: true,
-  introspection: true,
-  playground: config.playground,
-  subscriptions: {
-    onConnect: (connectionParams) => {
-      if (connectionParams.token) {
-        return userAPI.authenticate(connectionParams.token)
-      }
-      throw new Error('Missing authentication token')
-    },
-  },
-  engine: {
-    apiKey: process.env.ENGINE_API_KEY,
-  },
-})
+    const config = configurations[environment]
 
-const app = express()
-apollo.applyMiddleware({ app })
+    const dataSources = () => ({
+      userAPI,
+      atmosphereAPI: new AtmosphereAPI({ store, mqtt }),
+      alertAPI: new AlertAPI({ store }),
+      deviceAPI: new DeviceAPI({ store }),
+      piAPI: new PiAPI({ store, deviceManager }),
+      alarmAPI: new AlarmAPI({ store, alarm }),
+      subscriptionAPI: new SubscriptionAPI({ store }),
+    })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
-app.use(cors())
+    const apollo = new ApolloServer({
+      typeDefs,
+      resolvers,
+      dataSources,
+      context,
+      cors: true,
+      introspection: true,
+      playground: config.playground,
+      subscriptions: {
+        onConnect: (connectionParams) => {
+          if (connectionParams.token) {
+            return userAPI.authenticate(connectionParams.token)
+          }
+          throw new Error('Missing authentication token')
+        },
+      },
+      engine: {
+        apiKey: process.env.ENGINE_API_KEY,
+      },
+    })
 
-app.get('/', (req, res) => {
-  res.send(
-    '<html><p>Remember what your Mumma said, read the books your father read.</p></html>'
-  )
-})
+    const app = express()
+    apollo.applyMiddleware({ app })
 
-const server = http.createServer(app)
+    app.use(
+      morgan(':method :url :status :res[content-length] - :response-time ms')
+    )
+    app.use(cors())
 
-apollo.installSubscriptionHandlers(server)
+    app.get('/', (req, res) => {
+      res.send(
+        '<html><p>Remember what your Mumma said, read the books your father read.</p></html>'
+      )
+    })
 
-server.listen({ port: config.port }, () =>
-  console.log(
-    '🚀 Server ready at',
-    `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${
-      apollo.graphqlPath
-    }`
-  )
-)
+    const server = http.createServer(app)
 
-module.exports = {
-  dataSources,
-  typeDefs,
-  resolvers,
-  apollo,
-  store,
-  server,
-  context,
-}
+    apollo.installSubscriptionHandlers(server)
+
+    server.listen({ port: config.port }, () =>
+      console.log(
+        '🚀 Server ready at',
+        `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${
+          apollo.graphqlPath
+        }`
+      )
+    )
+    module.exports = {
+      dataSources,
+      typeDefs,
+      resolvers,
+      apollo,
+      store,
+      server,
+      context,
+    }
+  })
+  .catch((e) => {
+    console.log(e)
+  })

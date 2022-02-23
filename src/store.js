@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize')
 
 module.exports.createStore = () => {
-  const db = new Sequelize(
+  const sequalize = new Sequelize(
     process.env.DATABASE_NAME,
     process.env.DATABASE_USER,
     process.env.DATABASE_PASSWORD,
@@ -13,7 +13,8 @@ module.exports.createStore = () => {
     }
   )
 
-  db.authenticate()
+  sequalize
+    .authenticate()
     .then(() => {
       console.log('Connection to database has been established successfully.')
     })
@@ -21,7 +22,7 @@ module.exports.createStore = () => {
       console.log('Unable to connect to the database:', err)
     })
 
-  const users = db.define('user', {
+  const users = sequalize.define('user', {
     createdAt: Sequelize.DATE,
     email: {
       allowNull: false,
@@ -37,19 +38,19 @@ module.exports.createStore = () => {
     },
   })
 
-  const subscriptions = db.define('subscription', {
+  const subscriptions = sequalize.define('subscription', {
     createdAt: Sequelize.DATE,
     endpoint: Sequelize.STRING,
     p256dh: Sequelize.STRING,
     auth: Sequelize.STRING,
   })
 
-  const alerts = db.define('alert', {
+  const alerts = sequalize.define('alert', {
     createdAt: Sequelize.DATE,
     deviceId: Sequelize.INTEGER,
   })
 
-  const devices = db.define('device', {
+  const devices = sequalize.define('device', {
     createdAt: Sequelize.DATE,
     updatedAt: Sequelize.DATE,
     name: {
@@ -71,5 +72,5 @@ module.exports.createStore = () => {
   alerts.belongsTo(devices, { foreignKey: 'deviceId' })
   devices.hasMany(alerts)
 
-  return { db, alerts, devices, users, subscriptions }
+  return { sequalize, alerts, devices, users, subscriptions }
 }
