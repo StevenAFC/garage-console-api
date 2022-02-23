@@ -29,7 +29,7 @@ class Pi extends Service {
           this.updateState({ device: d, state: d.gpioHook.readSync() })
 
           if (d.input) {
-            d.gpioHook.watch((err, value) =>
+            d.gpioHook.watch((value) =>
               this.updateState({ device: d, state: value })
             )
           }
@@ -84,6 +84,7 @@ class Pi extends Service {
 
       const activeDevices = this.getDevices().filter((d) => {
         if (d.duration !== null && d.state === 1) return d
+        return false
       })
 
       if (activeDevices.length > 0) {
