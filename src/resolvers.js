@@ -9,7 +9,6 @@ module.exports = {
       return await dataSources.alertAPI.getAlerts()
     },
     devices: async (_, args, { req, dataSources, deviceManager }) => {
-      console.log('mook')
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       let results = await dataSources.deviceAPI.getDevices()
 
@@ -19,8 +18,6 @@ module.exports = {
           state: deviceManager.getDeviceState({ id: d.id }),
         }
       })
-
-      console.log(results)
 
       if (args.input !== undefined) {
         results = results.filter((r) => r.input === args.input)
