@@ -29,7 +29,7 @@ const Messages = require('./messages')
 const Mqtt = require('./mqtt')
 
 const environment = process.env.NODE_ENV || 'development'
-console.log("Environment: " + environment)
+console.log('Environment: ' + environment)
 
 const mqtt = new Mqtt()
 

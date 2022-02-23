@@ -8,17 +8,19 @@ module.exports = {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
       return await dataSources.alertAPI.getAlerts()
     },
-    devices: async (_, __, { req, dataSources }) => {
+    devices: async (_, args, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await dataSources.deviceAPI.getDevices()
-    },
-    outputDevices: async (_, __, { req, dataSources }) => {
-      if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await dataSources.deviceAPI.outputDevices()
-    },
-    alarmDevices: async (_, __, { req, dataSources }) => {
-      if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await dataSources.deviceAPI.alarmDevices()
+      let results = await dataSources.deviceAPI.getDevices()
+
+      if (args.input !== undefined) {
+        results = results.filter((r) => r.input === args.input)
+      }
+
+      if (args.alarmDevice !== undefined) {
+        results = results.filter((r) => r.alarmDevice === args.alarmDevice)
+      }
+
+      return results
     },
     alarmStatus: async (_, __, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null

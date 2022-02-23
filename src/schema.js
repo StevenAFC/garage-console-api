@@ -4,12 +4,10 @@ const typeDefs = gql`
   type Query {
     atmosphere: Atmosphere
     alerts: [Alert]
-    devices: [Device]
+    devices(input: Boolean, alarmDevice: Boolean): [Device]
     deviceState(id: ID!): Boolean
     deviceStates: [DeviceStatus]
-    alarmDevices: [Device]
     alarmStatus: String!
-    outputDevices: [Device]
     piStatus: PiStatus
   }
   type Mutation {
@@ -75,9 +73,7 @@ const typeDefs = gql`
     color: String
     icon: String
     deviceType: DeviceType
-    tuya_id: String
-    tuya_key: String
-    signal: String
+    config: String
   }
 `
 

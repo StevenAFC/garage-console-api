@@ -11,7 +11,16 @@ class DeviceAPI extends DataSource {
   }
 
   async getDevices() {
-    const found = await this.store.devices.findAll()
+    const found = await this.store.devices.findAll({
+      where: {},
+      include: [
+        {
+          model: this.store.alerts,
+          limit: 1,
+          order: [['createdAt', 'DESC']],
+        },
+      ],
+    })
     return found
   }
 

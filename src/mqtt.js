@@ -12,24 +12,29 @@ class Mqtt {
 
     this.subscribed = []
 
-    this.mqttClient.on('connect', function (e) {
+    this.mqttClient.on('connect', (e) => {
       console.log('MQTT Connected')
     })
 
-    this.mqttClient.on('error', function (e) {
+    this.mqttClient.on('error', (e) => {
       console.log(e)
       this.mqttClient.end()
     })
 
     this.mqttClient.on('message', (topic, message) => {
       this.lastMessage[topic] = message.toString()
+      this.subscribed
+        .filter((s) => s.topic === topic && s.cb !== undefined)
+        .forEach((s) => {
+          s.cb(message.toString())
+        })
     })
   }
 
-  subscribe(topic) {
-    if (this.subscribed.includes(topic)) return
+  subscribe(topic, cb) {
+    if (this.subscribed.some((s) => s.topic === topic)) return
     this.mqttClient.subscribe(topic)
-    this.subscribed.push(topic)
+    this.subscribed.push({ topic, cb })
   }
 
   getLast(topic) {

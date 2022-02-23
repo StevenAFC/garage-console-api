@@ -1,6 +1,7 @@
 const Tuya = require('./tuya')
 const Pi = require('./pi')
 const Rf = require('./rf')
+const Mqtt = require('./mqtt')
 
 class DeviceManager {
   constructor({ pubsub, store, mqtt }) {
@@ -11,8 +12,9 @@ class DeviceManager {
     this.tuya = new Tuya({ pubsub, mqtt })
     this.pi = new Pi({ pubsub, mqtt })
     this.rf = new Rf({ pubsub, mqtt })
+    this.mqtt = new Mqtt({ pubsub, mqtt })
 
-    this.services = [this.tuya, this.pi, this.rf]
+    this.services = [this.tuya, this.pi, this.rf, this.mqtt]
 
     this.initialize()
   }
@@ -31,6 +33,9 @@ class DeviceManager {
         case 'RF':
           this.rf.addDevice({ device })
           break
+        case 'MQTT':
+          this.mqtt.addDevice({ device })
+          break
       }
     })
 
@@ -46,7 +51,7 @@ class DeviceManager {
       devices.push(...service.getDevices())
     })
 
-    return devices.find((d) => d.id == id)
+    return devices.find((d) => d.id === id)
   }
 
   getDevices() {

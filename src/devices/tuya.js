@@ -88,9 +88,11 @@ class Tuya extends Service {
   }
 
   async addDevice({ device }) {
+    const config = JSON.parse(device.config)
+
     const tuyaHook = new TuyAPI({
-      id: device.tuyaId,
-      key: device.tuyaKey,
+      id: config.tuyaId,
+      key: config.tuyaKey,
     })
 
     this.devices.push({ ...device.dataValues, tuyaHook, state: null })

@@ -1,7 +1,6 @@
 const { Sequelize } = require('sequelize')
 
 module.exports.createStore = () => {
-
   const db = new Sequelize(
     process.env.DATABASE_NAME,
     process.env.DATABASE_USER,
@@ -66,9 +65,7 @@ module.exports.createStore = () => {
     icon: Sequelize.STRING,
     color: Sequelize.STRING,
     deviceType: Sequelize.STRING,
-    tuyaId: Sequelize.STRING,
-    tuyaKey: Sequelize.STRING,
-    signal: Sequelize.STRING,
+    config: Sequelize.STRING,
   })
 
   alerts.belongsTo(devices, { foreignKey: 'deviceId' })
