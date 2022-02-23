@@ -35,7 +35,7 @@ const store = createStore()
 const { sequalize } = store
 
 sequalize
-  .sync({ force: true })
+  .sync()
   .then(() => {
     const mqtt = new Mqtt()
 
