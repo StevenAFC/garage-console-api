@@ -28,7 +28,8 @@ const Messages = require('./messages')
 
 const Mqtt = require('./mqtt')
 
-const store = createStore()
+const environment = process.env.NODE_ENV || 'development'
+console.log("Environment: " + environment)
 
 const mqtt = new Mqtt()
 
@@ -41,16 +42,16 @@ const pubsub = new RedisPubSub({
   }),
 })
 
-const vapidKeys = {
-  publicKey: process.env.VAPID_PUBLIC_KEY,
-  privateKey: process.env.VAPID_PRIVATE_KEY,
-}
-
 webPush.setVapidDetails(
-  'mailto:steven@beeching.me',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
+  process.env.VAPID_SUBJECT,
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
 )
+
+const store = createStore()
+const { db } = store
+
+db.sync()
 
 const messages = new Messages({ store, webPush })
 const deviceManager = new DeviceManager({ pubsub, store, mqtt })
@@ -64,7 +65,7 @@ const configurations = {
     ssl: process.env.SSL === 'true',
     port: parseInt(process.env.PORT),
     hostname: process.env.IP_ADDRESS,
-    playground: process.env.PLAYGROUND === 'true',
+    playground: false,
   },
   development: {
     ssl: false,
@@ -74,7 +75,6 @@ const configurations = {
   },
 }
 
-const environment = process.env.NODE_ENV || 'production'
 const config = configurations[environment]
 
 const dataSources = () => ({

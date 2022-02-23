@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize')
 
 module.exports.createStore = () => {
+
   const db = new Sequelize(
     process.env.DATABASE_NAME,
     process.env.DATABASE_USER,
@@ -44,12 +45,6 @@ module.exports.createStore = () => {
     auth: Sequelize.STRING,
   })
 
-  const atmospheres = db.define('atmosphere', {
-    createdAt: Sequelize.DATE,
-    temperature: Sequelize.FLOAT,
-    humidity: Sequelize.FLOAT,
-  })
-
   const alerts = db.define('alert', {
     createdAt: Sequelize.DATE,
     deviceId: Sequelize.INTEGER,
@@ -77,10 +72,7 @@ module.exports.createStore = () => {
   })
 
   alerts.belongsTo(devices, { foreignKey: 'deviceId' })
-
   devices.hasMany(alerts)
 
-  db.sync()
-
-  return { db, atmospheres, alerts, devices, users, subscriptions }
+  return { db, alerts, devices, users, subscriptions }
 }
