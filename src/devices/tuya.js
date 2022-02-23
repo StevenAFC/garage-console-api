@@ -12,9 +12,7 @@ class Tuya extends Service {
       try {
         this.connectToDevice({ device })
       } catch (e) {
-        console.log(
-          `Tuya: Error initializing Tuya  ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}: ${e.message}`
-        )
+        console.log(`Tuya: Error initializing Tuya: ${e.message}`)
       }
     })
   }
@@ -31,16 +29,12 @@ class Tuya extends Service {
         return false
       }
     } catch (e) {
-      console.log(
-        `Tuya: Unable to connect to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}: ${e.message}`
-      )
+      console.log(`Tuya: Unable to connect to ${device.name}: ${e.message}`)
     }
   }
 
   reconnectToDevice({ device }) {
-    console.log(
-      `Tuya: Reconnecting to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}) in 5 seconds`
-    )
+    console.log(`Tuya: Reconnecting to ${device.name} in 5 seconds`)
     setTimeout(() => this.connectToDevice({ device }), 5000)
   }
 
@@ -49,29 +43,21 @@ class Tuya extends Service {
       .find()
       .then(() => device.tuyaHook.connect())
       .catch((e) => {
-        console.log(
-          `Tuya: Error connecting to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}): ${e.message}`
-        )
+        console.log(`Tuya: Error connecting to ${device.name}: ${e.message}`)
       })
 
     device.tuyaHook.on('connected', () => {
-      console.log(
-        `Tuya: Connected to ${device.name} (id:${device.tuyaId} key:${device.tuyaKey})`
-      )
+      console.log(`Tuya: Connected to ${device.name}`)
     })
 
     device.tuyaHook.on('disconnected', () => {
-      console.log(
-        `Tuya: Disconnected from ${device.name} (id:${device.tuyaId} key:${device.tuyaKey})`
-      )
+      console.log(`Tuya: Disconnected from ${device.name}`)
       // this.reconnectToDevice({ device })
       this.updateState({ state: null, device })
     })
 
     device.tuyaHook.on('error', (e) => {
-      console.log(
-        `Tuya: Error on device: ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}): ${e.message}`
-      )
+      console.log(`Tuya: Error on device: ${device.name}: ${e.message}`)
       device.tuyaHook.disconnect()
       this.updateState({ state: null, device })
     })
@@ -80,9 +66,7 @@ class Tuya extends Service {
       try {
         this.updateState({ state: data.dps['1'], device })
       } catch (e) {
-        console.log(
-          `Tuya: Error receiving data ${device.name} (id:${device.tuyaId} key:${device.tuyaKey}): ${e.message}`
-        )
+        console.log(`Tuya: Error receiving data ${device.name}: ${e.message}`)
       }
     })
   }
