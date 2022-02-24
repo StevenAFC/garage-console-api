@@ -32,7 +32,7 @@ class Mqtt extends Service {
       output = state
     }
 
-    this.updateState({ device, state: output >= 1 ? 1 : 0 })
+    this.updateState({ device, state: (output >= 1 ? 1 : 0) ^ device.inverted })
   }
 }
 
