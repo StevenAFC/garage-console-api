@@ -49,10 +49,11 @@ transmit_code(code)
   }
 
   async devicePulse({ device }) {
-    const config = JSON.parse(device.dataValues.config)
+    const config = JSON.parse(device.config)
+
     PythonShell.runString(
       this.pythonScript,
-      { args: [device.dataValues.gpio, config.signal] },
+      { args: [device.gpio, config.signal] },
       (err) => {
         if (err) console.log(err)
       }

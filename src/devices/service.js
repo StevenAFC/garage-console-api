@@ -6,7 +6,7 @@ class Service {
     this.deviceType = null
   }
 
-  async addDevice({ device }) {
+  addDevice({ device }) {
     this.devices.push({ ...device.dataValues, state: null })
   }
 
@@ -54,13 +54,11 @@ class Service {
     }
   }
 
-  async setState() {}
+  setState() {}
 
-  async initialize() {}
+  initialize() {}
 
-  async devicePulse() {}
-
-  async watchInputDevice() {}
+  devicePulse() {}
 
   // prettier-ignore
   consoleLog({ device, message, colour }) {

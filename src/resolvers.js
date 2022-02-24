@@ -45,7 +45,7 @@ module.exports = {
   Mutation: {
     devicePulse: async (_, args, { req, dataSources, deviceManager }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null
-      return await deviceManager.devicePulse(args.id)
+      return await deviceManager.devicePulse({ id: args.id })
     },
     alarmState: async (_, args, { req, dataSources }) => {
       if (!dataSources.userAPI.authenticate(req.headers.token)) return null

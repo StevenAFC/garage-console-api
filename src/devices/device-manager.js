@@ -64,7 +64,7 @@ class DeviceManager {
     return devices
   }
 
-  async getDeviceStates() {
+  getDeviceStates() {
     const devices = this.getDevices()
 
     return devices.map((d) => {
@@ -80,8 +80,8 @@ class DeviceManager {
     return device.state
   }
 
-  async devicePulse(id) {
-    const device = await this.store.devices.findByPk(id)
+  devicePulse({ id }) {
+    const device = this.getDevice({ id })
 
     switch (device.deviceType) {
       case 'RASPBERRY_PI':
@@ -93,25 +93,14 @@ class DeviceManager {
     }
   }
 
-  async setState({ device, state }) {
-    const d = await this.store.devices.findByPk(device.id)
+  setState({ device, state }) {
+    const d = this.getDevice({ id: device.id })
 
     switch (d.deviceType) {
       case 'RASPBERRY_PI':
         return this.pi.setState({ device, state })
       case 'TUYA':
         return this.tuya.setState({ device, state })
-    }
-  }
-
-  async watchInputDevice({ device, cb }) {
-    const d = await this.store.devices.findByPk(device.id)
-
-    switch (d.deviceType) {
-      case 'RASPBERRY_PI':
-        return this.pi.watchInputDevice({ device: d, cb })
-      case 'TUYA':
-        return this.tuya.watchInputDevice({ device: d, cb })
     }
   }
 }

@@ -7,9 +7,9 @@ class Pi extends Service {
     this.deviceType = 'RASPBERRY_PI'
   }
 
-  async addDevice({ device }) {
+  addDevice({ device }) {
     let gpioHook = null
-    let state = false
+    let state = null
     if (Gpio.accessible) {
       gpioHook = new Gpio(device.gpio, device.input ? 'in' : 'out', 'both', {
         debounceTimeout: device.debounce,
@@ -17,21 +17,27 @@ class Pi extends Service {
       })
 
       state = gpioHook.readSync()
+    } else {
+      this.consoleLog({
+        device,
+        message: 'Device cannot be initialised as the GPIO is inaccessible',
+        colour: 31,
+      })
     }
 
-    this.devices.push({ ...device.dataValues, gpioHook, state })
+    this.devices.push({ ...device.dataValues, state, gpioHook })
   }
 
-  async initialize() {
+  initialize() {
+    // setup watch callback for input devices
     this.devices.forEach((d) => {
       try {
         if (Gpio.accessible) {
-          this.updateState({ device: d, state: d.gpioHook.readSync() })
-
           if (d.input) {
-            d.gpioHook.watch((value) =>
+            d.gpioHook.watch((err, value) => {
+              if (err) console.log(err)
               this.updateState({ device: d, state: value })
-            )
+            })
           }
         }
       } catch (e) {
@@ -40,19 +46,19 @@ class Pi extends Service {
     })
   }
 
-  async devicePulse({ device }) {
+  devicePulse({ device }) {
     // if device duration is null we are assuming that the device is a toggle
     if (device.duration === null) {
-      return await this.toggle({ device })
+      return this.toggle({ device })
     } else {
-      return await this.relayTrigger({
+      return this.relayTrigger({
         device: device,
         duration: device.duration,
       })
     }
   }
 
-  async toggle({ device }) {
+  toggle({ device }) {
     try {
       const state = !this.getDevice({ deviceId: device.id }).state
       this.setState({ device, state })
@@ -63,11 +69,7 @@ class Pi extends Service {
     }
   }
 
-  async relayLatch({ device, state }) {
-    this.setState({ device, state })
-  }
-
-  async relayTrigger({ device, duration }) {
+  relayTrigger({ device, duration }) {
     try {
       /* const isActive = this.getDevice({ deviceId: device.id })
         ? this.getDevice({ deviceId: device.id }).state
@@ -113,61 +115,32 @@ class Pi extends Service {
     }
   }
 
+  setState({ device, state }) {
+    if (Gpio.accessible) {
+      device.gpioHook.writeSync(state ? 1 : 0)
+
+      this.updateState({ device, state })
+
+      this.consoleLog({
+        device,
+        message: 'has been set to: ' + state,
+        colour: 32,
+      })
+    } else {
+      this.consoleLog({
+        device,
+        message:
+          'Pin cannot be set to ' + state + ' as the GPIO is inaccessible',
+        colour: 31,
+      })
+    }
+  }
+
   setTimeout({ device, timeout }) {
     this.devices = this.devices.map((d) => {
       if (d.id === device.id) d.timeout = timeout
       return d
     })
-  }
-
-  setState({ device, state }) {
-    try {
-      if (Gpio.accessible) {
-        this.getDevice({ deviceId: device.id }).gpioHook.writeSync(
-          state ? 1 : 0
-        )
-        this.updateState({ device, state })
-
-        this.consoleLog({
-          device,
-          message: 'has been set to: ' + state,
-          colour: 32,
-        })
-      } else {
-        this.consoleLog({
-          device,
-          message:
-            'pin cannot be set to ' + state + ' as the GPIO is inaccessible',
-          colour: 31,
-        })
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async watchInputDevice({ device, cb }) {
-    try {
-      if (Gpio.accessible) {
-        this.getDevice({ deviceId: device.id }).gpioHook.watch(() => {
-          cb()
-        })
-
-        this.consoleLog({
-          device,
-          message: 'has been initialised',
-          colour: 32,
-        })
-      } else {
-        this.consoleLog({
-          device,
-          message: 'cannot be initialised as the GPIO is inaccessible',
-          colour: 32,
-        })
-      }
-    } catch (e) {
-      console.log(e)
-    }
   }
 }
 
