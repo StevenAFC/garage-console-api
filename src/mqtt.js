@@ -5,7 +5,7 @@ class Mqtt {
     this.mqttClient = mqttclient.connect(`mqtt://${process.env.MQTT_HOST}`, {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
-      reconnectPeriod: 1,
+      reconnectPeriod: 1000,
     })
 
     this.lastMessage = {}
@@ -17,7 +17,7 @@ class Mqtt {
     })
 
     this.mqttClient.on('error', (e) => {
-      console.log(e)
+      console.log(`MQTT Client Error: ${e}`)
       this.mqttClient.end()
     })
 
