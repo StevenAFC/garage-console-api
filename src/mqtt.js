@@ -17,8 +17,8 @@ class Mqtt {
     })
 
     this.mqttClient.on('error', (e) => {
-      console.log(`MQTT Client Error: ${e}`)
-      this.mqttClient.end()
+      console.log(`MQTT Client: ${e}`)
+      this.mqttClient.reconnect()
     })
 
     this.mqttClient.on('message', (topic, message) => {
