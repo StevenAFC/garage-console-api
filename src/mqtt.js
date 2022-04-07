@@ -12,14 +12,13 @@ class Mqtt {
 
     this.subscribed = []
 
-    this.mqttClient.on('connect', (e) => {
+    this.mqttClient.on('connect', () => {
       console.log('MQTT Connected')
       this.resubscribe()
     })
 
     this.mqttClient.on('error', (e) => {
       console.log(`MQTT Client: ${e}`)
-      this.delay(5000).then(() => this.mqttClient.reconnect())
     })
 
     this.mqttClient.on('message', (topic, message) => {
@@ -34,12 +33,14 @@ class Mqtt {
 
   subscribe(topic, cb) {
     if (this.subscribed.some((s) => s.topic === topic)) return
+    console.log(`MQTT: Subscribing to ${topic}`)
     this.mqttClient.subscribe(topic)
     this.subscribed.push({ topic, cb })
   }
 
   resubscribe() {
     this.subscribed.forEach((s) => {
+      console.log(`MQTT: Resubscribing to ${s.topic}`)
       this.mqttClient.subscribe(s.topic)
     })
   }
@@ -50,10 +51,6 @@ class Mqtt {
 
   publish({ topic, message }) {
     this.mqttClient.publish(topic, message)
-  }
-
-  delay(time) {
-    return new Promise((resolve) => setTimeout(resolve, time))
   }
 }
 
