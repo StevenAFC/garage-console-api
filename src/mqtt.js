@@ -14,11 +14,12 @@ class Mqtt {
 
     this.mqttClient.on('connect', (e) => {
       console.log('MQTT Connected')
+      this.resubscribe()
     })
 
     this.mqttClient.on('error', (e) => {
       console.log(`MQTT Client: ${e}`)
-      this.mqttClient.reconnect()
+      this.delay(5000).then(() => this.mqttClient.reconnect())
     })
 
     this.mqttClient.on('message', (topic, message) => {
@@ -37,12 +38,22 @@ class Mqtt {
     this.subscribed.push({ topic, cb })
   }
 
+  resubscribe() {
+    this.subscribed.forEach((s) => {
+      this.mqttClient.subscribe(s.topic)
+    })
+  }
+
   getLast(topic) {
     return topic in this.lastMessage ? this.lastMessage[topic] : false
   }
 
   publish({ topic, message }) {
     this.mqttClient.publish(topic, message)
+  }
+
+  delay(time) {
+    return new Promise((resolve) => setTimeout(resolve, time))
   }
 }
 
