@@ -24,10 +24,17 @@ class Mqtt extends Service {
     const config = JSON.parse(device.config)
     let output
 
+    console.log(`MQTT Setting State: ${state}`)
+    console.log(`MQTT Setting Config: ${config.path}`)
+
     if (config.path) {
-      output = config.path.split('.').reduce((p, prop) => {
-        return p[prop]
-      }, JSON.parse(state))
+      try {
+        output = config.path.split('.').reduce((p, prop) => {
+          return p[prop]
+        }, JSON.parse(state))
+      } catch (e) {
+        console.error(`Error parsing MQTT JSON state: ${state} error: ${e}`)
+      }
     } else {
       output = state
     }
