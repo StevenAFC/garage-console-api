@@ -75,5 +75,9 @@ module.exports = {
         return payload
       },
     },
+    rfSignalReceived: {
+      subscribe: (_, __, { pubsub }) =>
+        pubsub.asyncIterator('RF_SIGNAL_RECEIVED'),
+    },
   },
 }

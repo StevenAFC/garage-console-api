@@ -11,12 +11,12 @@ import time
 import sys
 import RPi.GPIO as GPIO
 
-code = sys.argv[1:][1]
+code = sys.argv[2]
 short_delay = 0.00020
 extended_delay = 0.0096
 
 NUM_ATTEMPTS = 10
-TRANSMIT_PIN = int(sys.argv[1:][0])
+TRANSMIT_PIN = int(sys.argv[1])
 
 def transmit_code(code):
     GPIO.setmode(GPIO.BCM)
@@ -48,12 +48,13 @@ transmit_code(code)
     this.devices.push({ ...device.dataValues, state })
   }
 
-  async devicePulse({ device }) {
+  async devicePulse({ device, code }) {
     const config = JSON.parse(device.config)
+    const signal = code || config.signal
 
     PythonShell.runString(
       this.pythonScript,
-      { args: [device.gpio, config.signal] },
+      { args: [device.gpio, signal] },
       (err) => {
         if (err) console.log(err)
       }

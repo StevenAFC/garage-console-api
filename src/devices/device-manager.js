@@ -1,6 +1,7 @@
 const Tuya = require('./tuya')
 const Pi = require('./pi')
 const Rf = require('./rf')
+const RfReceive = require('./rf-receive')
 const Mqtt = require('./mqtt')
 
 class DeviceManager {
@@ -12,11 +13,22 @@ class DeviceManager {
     this.tuya = new Tuya({ pubsub, mqtt })
     this.pi = new Pi({ pubsub, mqtt })
     this.rf = new Rf({ pubsub, mqtt })
+    this.rfReceive = new RfReceive({ pubsub, mqtt })
     this.mqtt = new Mqtt({ pubsub, mqtt })
 
-    this.services = [this.tuya, this.pi, this.rf, this.mqtt]
+    this.services = [this.tuya, this.pi, this.rf, this.rfReceive, this.mqtt]
 
     this.initialize()
+
+    this.pubsub.subscribe('RF_SIGNAL_RECEIVED', ({ rfSignalReceived }) => {
+      const { signal } = rfSignalReceived
+      const device = this.getDevices().find(
+        (d) => d.name === 'Garage Door Opener'
+      )
+      if (device) {
+        this.rf.devicePulse({ device, code: signal })
+      }
+    })
   }
 
   async initialize() {
@@ -32,6 +44,9 @@ class DeviceManager {
           break
         case 'RF':
           this.rf.addDevice({ device })
+          break
+        case 'RF_RECEIVE':
+          this.rfReceive.initialize({ device })
           break
         case 'MQTT':
           this.mqtt.addDevice({ device })

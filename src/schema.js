@@ -20,6 +20,7 @@ const typeDefs = gql`
     alarmStatus: String
     alarmDevices: [Device]
     deviceState: Device
+    rfSignalReceived: String
   }
   type LoginResponse {
     token: String
