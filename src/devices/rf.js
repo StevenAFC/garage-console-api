@@ -52,15 +52,20 @@ transmit_code(code)
     const config = JSON.parse(device.config)
     const signal = code || config.signal
 
-    PythonShell.runString(
-      this.pythonScript,
-      { args: [device.gpio, signal] },
-      (err) => {
-        if (err) console.log(err)
-      }
-    )
-
-    return true
+    return new Promise((resolve, reject) => {
+      PythonShell.runString(
+        this.pythonScript,
+        { args: [device.gpio, signal] },
+        (err) => {
+          if (err) {
+            console.log(err)
+            reject(err)
+          } else {
+            resolve(true)
+          }
+        }
+      )
+    })
   }
 }
 

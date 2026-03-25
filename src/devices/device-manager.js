@@ -20,13 +20,19 @@ class DeviceManager {
 
     this.initialize()
 
-    this.pubsub.subscribe('RF_SIGNAL_RECEIVED', ({ rfSignalReceived }) => {
-      const { signal } = rfSignalReceived
+    this.pubsub.subscribe('RF_SIGNAL_RECEIVED', async () => {
       const device = this.getDevices().find(
         (d) => d.name === 'Garage Door Opener'
       )
       if (device) {
-        this.rf.devicePulse({ device, code: signal })
+        this.rfReceive.pause()
+        try {
+          await this.rf.devicePulse({ device })
+        } catch (err) {
+          console.error('RF transmit error:', err)
+        } finally {
+          this.rfReceive.resume()
+        }
       }
     })
   }

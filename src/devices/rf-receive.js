@@ -6,20 +6,23 @@ class RfReceive extends Service {
   constructor({ pubsub, mqtt }) {
     super({ pubsub, mqtt })
     this.deviceType = 'RF_RECEIVE'
+    this.shell = null
   }
 
-  initialize({ device }) {
+  initialize({ device } = {}) {
+    if (!device) return
     this.device = device
     this.start()
   }
 
-  async start() {
+  start() {
+    if (this.shell || !this.device) return
     const scriptPath = path.join(__dirname, 'rf-receive.py')
-    const shell = new PythonShell(scriptPath, {
+    this.shell = new PythonShell(scriptPath, {
       args: [this.device.gpio],
     })
 
-    shell.on('message', (message) => {
+    this.shell.on('message', (message) => {
       console.log('Received RF Signal:', message)
       this.pubsub.publish('RF_SIGNAL_RECEIVED', {
         rfSignalReceived: {
@@ -27,6 +30,24 @@ class RfReceive extends Service {
         },
       })
     })
+
+    this.shell.on('error', (err) => {
+      console.error('RF Receive error:', err)
+      this.shell = null
+    })
+  }
+
+  pause() {
+    if (this.shell) {
+      this.shell.kill()
+      this.shell = null
+      console.log('RF Receiver paused for transmission')
+    }
+  }
+
+  resume() {
+    console.log('RF Receiver resuming')
+    this.start()
   }
 }
 
