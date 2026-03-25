@@ -2,10 +2,45 @@ import sys
 import time
 import RPi.GPIO as GPIO
 
-# Collect timing of all transitions, starting on a falling edge.
-# Outputs raw microsecond durations so the protocol can be identified.
-PACKET_GAP_US = 10000  # 10ms silence = end of packet
-MIN_TRANSITIONS = 20   # ignore tiny noise bursts
+# Real OOK signals have pulses that cluster into exactly two groups
+# (short and long). Noise is random and won't pass this test.
+PACKET_GAP_MS = 15   # gap this long = end of packet
+MIN_TRANSITIONS = 20 # minimum transitions after filtering
+
+def decode(transitions):
+    # Strip extreme outliers
+    filtered = [t for t in transitions if 50 < t < 10000]
+    if len(filtered) < MIN_TRANSITIONS:
+        return None
+
+    sorted_t = sorted(filtered)
+
+    # Find the biggest gap in the sorted values - this is the split
+    # point between the "short" and "long" timing clusters
+    split_idx = max(range(len(sorted_t) - 1), key=lambda i: sorted_t[i+1] - sorted_t[i])
+
+    short_vals = sorted_t[:split_idx + 1]
+    long_vals  = sorted_t[split_idx + 1:]
+
+    if not short_vals or not long_vals:
+        return None
+
+    short_avg = sum(short_vals) / len(short_vals)
+    long_avg  = sum(long_vals)  / len(long_vals)
+
+    # The two clusters must be clearly separated (ratio > 1.5x)
+    if long_avg / short_avg < 1.5:
+        return None
+
+    # Each cluster must be internally consistent (coefficient of variation < 0.4)
+    def cv(vals, avg):
+        return (sum((v - avg) ** 2 for v in vals) / len(vals)) ** 0.5 / avg
+
+    if cv(short_vals, short_avg) > 0.4 or cv(long_vals, long_avg) > 0.4:
+        return None
+
+    threshold = (short_avg + long_avg) / 2
+    return ''.join('1' if t >= threshold else '0' for t in filtered)
 
 try:
     RECEIVE_PIN = int(sys.argv[1])
@@ -15,27 +50,28 @@ try:
     GPIO.setup(RECEIVE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     while True:
-        # Wait for pin to go LOW (falling edge = start of a real signal)
+        transitions = []
+
         GPIO.wait_for_edge(RECEIVE_PIN, GPIO.FALLING, timeout=1000)
         if GPIO.input(RECEIVE_PIN) != 0:
             continue
 
-        transitions = []
         last = time.time()
 
         while True:
-            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.BOTH, timeout=15)
+            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.BOTH, timeout=PACKET_GAP_MS)
             now = time.time()
             duration_us = int((now - last) * 1_000_000)
 
-            if result is None or duration_us >= PACKET_GAP_US:
+            if result is None or duration_us >= PACKET_GAP_MS * 1000:
                 break
 
             transitions.append(duration_us)
             last = now
 
-        if len(transitions) >= MIN_TRANSITIONS:
-            print(f"Timings: {transitions}", flush=True)
+        code = decode(transitions)
+        if code:
+            print(code, flush=True)
 
 except Exception as e:
     print(f"Error: {e}", flush=True)
