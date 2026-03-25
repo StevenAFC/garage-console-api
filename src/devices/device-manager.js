@@ -23,18 +23,21 @@ class DeviceManager {
     this.pubsub.subscribe('RF_SIGNAL_RECEIVED', ({ rfSignalReceived }) => {
       const { code } = rfSignalReceived
 
-      const rfDevices = this.rf.getDevices()
+      const rfReceiveDevice = this.rfReceive.device
+      let expectedCode = null
+      try {
+        expectedCode = rfReceiveDevice?.config
+          ? JSON.parse(rfReceiveDevice.config).receiveCode
+          : null
+      } catch { /* invalid config */ }
 
-      const matchingDevice = rfDevices.find((d) => {
-        try {
-          return JSON.parse(d.config || '{}').receiveCode === code
-        } catch {
-          return false
-        }
-      })
-
-      if (!matchingDevice) {
+      if (!expectedCode) {
         console.log(`RF code received (not yet configured): ${code}`)
+        return
+      }
+
+      if (code !== expectedCode) {
+        console.log(`RF code received (no match): ${code}`)
         return
       }
 
@@ -63,7 +66,6 @@ class DeviceManager {
           break
         case 'RF':
           this.rf.addDevice({ device })
-          this.rfReceive.initialize({ device })
           break
         case 'RF_RECEIVE':
           this.rfReceive.initialize({ device })
