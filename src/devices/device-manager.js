@@ -20,26 +20,11 @@ class DeviceManager {
 
     this.initialize()
 
-    this.pubsub.subscribe('RF_SIGNAL_RECEIVED', ({ rfSignalReceived }) => {
-      const { code } = rfSignalReceived
+    this.pubsub.subscribe('DEVICE_STATE', ({ id, state }) => {
+      if (state !== 1) return
 
-      const rfReceiveDevice = this.rfReceive.device
-      let expectedCode = null
-      try {
-        expectedCode = rfReceiveDevice?.config
-          ? JSON.parse(rfReceiveDevice.config).receiveCode
-          : null
-      } catch { /* invalid config */ }
-
-      if (!expectedCode) {
-        console.log(`RF code received (not yet configured): ${code}`)
-        return
-      }
-
-      if (code !== expectedCode && code !== Number(expectedCode)) {
-        console.log(`RF code received (no match): ${code}`)
-        return
-      }
+      const device = this.getDevice({ id })
+      if (!device || device.name !== 'RF Remote Button') return
 
       const sensor = this.getDevices().find((d) => d.name === 'Garage Door Sensor')
       const isClosed = sensor ? sensor.state === 1 : true
@@ -47,7 +32,7 @@ class DeviceManager {
       const targetDevice = this.getDevices().find((d) => d.name === targetName)
 
       if (targetDevice) {
-        console.log(`RF code matched — triggering: ${targetName}`)
+        console.log(`RF Remote Button triggered — ${targetName}`)
         this.pi.devicePulse({ device: targetDevice })
       }
     })
@@ -126,8 +111,7 @@ class DeviceManager {
       case 'TUYA':
         return this.tuya.devicePulse({ device })
       case 'RF':
-        this.rfReceive.pause()
-        return this.rf.devicePulse({ device }).finally(() => this.rfReceive.resume())
+        return this.rf.devicePulse({ device })
     }
   }
 
