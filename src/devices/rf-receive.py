@@ -2,10 +2,10 @@ import sys
 import time
 import RPi.GPIO as GPIO
 
-# A '1' bit is a ~200us HIGH pulse
-# A '0' bit is a ~0us HIGH spike then ~200us LOW
-# Threshold to distinguish them
-BIT_THRESHOLD = 0.00005  # 50us
+# Collect timing of all transitions, starting on a falling edge.
+# Outputs raw microsecond durations so the protocol can be identified.
+PACKET_GAP_US = 10000  # 10ms silence = end of packet
+MIN_TRANSITIONS = 20   # ignore tiny noise bursts
 
 try:
     RECEIVE_PIN = int(sys.argv[1])
@@ -15,36 +15,27 @@ try:
     GPIO.setup(RECEIVE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     while True:
-        # Wait for start of a transmission (rising edge)
-        GPIO.wait_for_edge(RECEIVE_PIN, GPIO.RISING, timeout=1000)
-
-        if not GPIO.input(RECEIVE_PIN):
+        # Wait for pin to go LOW (falling edge = start of a real signal)
+        GPIO.wait_for_edge(RECEIVE_PIN, GPIO.FALLING, timeout=1000)
+        if GPIO.input(RECEIVE_PIN) != 0:
             continue
 
-        code = ''
+        transitions = []
+        last = time.time()
 
         while True:
-            rise_time = time.time()
+            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.BOTH, timeout=15)
+            now = time.time()
+            duration_us = int((now - last) * 1_000_000)
 
-            # Measure how long pin stays HIGH
-            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.FALLING, timeout=10)
-            high_duration = time.time() - rise_time
-
-            if result is None:
-                # No falling edge within 10ms - end of signal
+            if result is None or duration_us >= PACKET_GAP_US:
                 break
 
-            code += '1' if high_duration >= BIT_THRESHOLD else '0'
+            transitions.append(duration_us)
+            last = now
 
-            # Wait for next rising edge (next bit) or gap (end of packet)
-            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.RISING, timeout=10)
-
-            if result is None:
-                # No rising edge within 10ms - end of packet
-                break
-
-        if len(code) > 10:
-            print(code, flush=True)
+        if len(transitions) >= MIN_TRANSITIONS:
+            print(f"Timings: {transitions}", flush=True)
 
 except Exception as e:
     print(f"Error: {e}", flush=True)
