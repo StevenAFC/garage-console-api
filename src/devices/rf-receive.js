@@ -23,20 +23,27 @@ class RfReceive extends Service {
     })
 
     this.shell.on('message', (message) => {
-      const parts = message.split(',')
-      if (parts.length === 3) {
-        const [code, protocol, pulselength] = parts.map(Number)
-        console.log(`Received RF code: ${code} (protocol ${protocol}, pulselength ${pulselength}μs)`)
+      if (/^[01]+$/.test(message)) {
+        console.log(`Received RF code: ${message}`)
         this.pubsub.publish('RF_SIGNAL_RECEIVED', {
-          rfSignalReceived: { code, protocol, pulselength },
+          rfSignalReceived: { code: message },
         })
       } else {
         console.log('RF Receiver:', message)
       }
     })
 
+    this.shell.on('stderr', (err) => {
+      console.error('RF Receive stderr:', err)
+    })
+
     this.shell.on('error', (err) => {
       console.error('RF Receive error:', err)
+      this.shell = null
+    })
+
+    this.shell.on('close', () => {
+      console.log('RF Receive process closed')
       this.shell = null
     })
   }

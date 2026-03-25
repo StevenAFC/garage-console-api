@@ -1,28 +1,53 @@
 import sys
 import time
-import signal
-from rpi_rf import RFDevice
+import RPi.GPIO as GPIO
+
+# A '1' bit is a ~200us HIGH pulse
+# A '0' bit is a ~0us HIGH spike then ~200us LOW
+# Threshold to distinguish them
+BIT_THRESHOLD = 0.00005  # 50us
 
 try:
     RECEIVE_PIN = int(sys.argv[1])
     print(f"Starting RF receiver on GPIO {RECEIVE_PIN}", flush=True)
 
-    rfdevice = RFDevice(RECEIVE_PIN)
-    rfdevice.enable_rx()
-    timestamp = None
-
-    def cleanup(*_):
-        rfdevice.cleanup()
-        sys.exit(0)
-
-    signal.signal(signal.SIGTERM, cleanup)
-    signal.signal(signal.SIGINT, cleanup)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(RECEIVE_PIN, GPIO.IN)
 
     while True:
-        if rfdevice.rx_code_timestamp != timestamp:
-            timestamp = rfdevice.rx_code_timestamp
-            print(f"{rfdevice.rx_code},{rfdevice.rx_proto},{rfdevice.rx_pulselength}", flush=True)
-        time.sleep(0.01)
+        # Wait for start of a transmission (rising edge)
+        GPIO.wait_for_edge(RECEIVE_PIN, GPIO.RISING, timeout=1000)
+
+        if not GPIO.input(RECEIVE_PIN):
+            continue
+
+        code = ''
+
+        while True:
+            rise_time = time.time()
+
+            # Measure how long pin stays HIGH
+            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.FALLING, timeout=10)
+            high_duration = time.time() - rise_time
+
+            if result is None:
+                # No falling edge within 10ms - end of signal
+                break
+
+            code += '1' if high_duration >= BIT_THRESHOLD else '0'
+
+            # Wait for next rising edge (next bit) or gap (end of packet)
+            result = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.RISING, timeout=10)
+
+            if result is None:
+                # No rising edge within 10ms - end of packet
+                break
+
+        if len(code) > 10:
+            print(code, flush=True)
 
 except Exception as e:
     print(f"Error: {e}", flush=True)
+
+finally:
+    GPIO.cleanup()

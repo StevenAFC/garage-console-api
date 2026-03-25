@@ -34,16 +34,7 @@ class DeviceManager {
       })
 
       if (!matchingDevice) {
-        const hasAnyReceiveCode = rfDevices.some((d) => {
-          try {
-            return JSON.parse(d.config || '{}').receiveCode
-          } catch {
-            return false
-          }
-        })
-        if (!hasAnyReceiveCode) {
-          console.log(`RF code received (not yet configured): ${code}`)
-        }
+        console.log(`RF code received (not yet configured): ${code}`)
         return
       }
 
