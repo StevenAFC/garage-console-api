@@ -12,7 +12,7 @@ try:
     print(f"Starting RF receiver on GPIO {RECEIVE_PIN}", flush=True)
 
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(RECEIVE_PIN, GPIO.IN)
+    GPIO.setup(RECEIVE_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     while True:
         # Wait for start of a transmission (rising edge)
