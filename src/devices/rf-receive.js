@@ -23,10 +23,12 @@ class RfReceive extends Service {
     })
 
     this.shell.on('message', (message) => {
-      if (/^[01]+$/.test(message)) {
-        console.log(`Received RF code: ${message}`)
+      const parts = message.split(',')
+      if (parts.length === 3) {
+        const [code, proto, pulse] = parts.map(Number)
+        console.log(`Received RF code: ${code} (protocol ${proto}, pulselength ${pulse}μs)`)
         this.pubsub.publish('RF_SIGNAL_RECEIVED', {
-          rfSignalReceived: { code: message },
+          rfSignalReceived: { code },
         })
       } else {
         console.log('RF Receiver:', message)

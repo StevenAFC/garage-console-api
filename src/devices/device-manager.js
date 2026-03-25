@@ -36,7 +36,7 @@ class DeviceManager {
         return
       }
 
-      if (code !== expectedCode) {
+      if (code !== expectedCode && code !== Number(expectedCode)) {
         console.log(`RF code received (no match): ${code}`)
         return
       }
