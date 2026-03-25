@@ -6,7 +6,7 @@ WORKDIR /app
 # Install Python and RF libraries
 RUN apt-get update && \
     apt-get install -y python3 python3-pip && \
-    pip3 install RPi.GPIO rpi-rf --break-system-packages
+    pip3 install RPi.GPIO rpi-rf
 
 #COPY package-lock.json .
 COPY ["package.json", "package-lock.json*", "./"]
