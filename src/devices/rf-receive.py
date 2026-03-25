@@ -1,22 +1,28 @@
 import sys
-import RPi.GPIO as GPIO
-from datetime import datetime
+import time
+import signal
+from rpi_rf import RFDevice
 
 try:
     RECEIVE_PIN = int(sys.argv[1])
     print(f"Starting RF receiver on GPIO {RECEIVE_PIN}", flush=True)
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(RECEIVE_PIN, GPIO.IN)
+    rfdevice = RFDevice(RECEIVE_PIN)
+    rfdevice.enable_rx()
+    timestamp = None
+
+    def cleanup(*_):
+        rfdevice.cleanup()
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, cleanup)
+    signal.signal(signal.SIGINT, cleanup)
 
     while True:
-        channel = GPIO.wait_for_edge(RECEIVE_PIN, GPIO.RISING, timeout=500)
-        if channel is not None:
-            print(f"[{datetime.now()}] Received signal on GPIO {RECEIVE_PIN}", flush=True)
+        if rfdevice.rx_code_timestamp != timestamp:
+            timestamp = rfdevice.rx_code_timestamp
+            print(f"{rfdevice.rx_code},{rfdevice.rx_proto},{rfdevice.rx_pulselength}", flush=True)
+        time.sleep(0.01)
 
 except Exception as e:
-    print(e, flush=True)
-
-finally:
-    GPIO.cleanup()
-
+    print(f"Error: {e}", flush=True)

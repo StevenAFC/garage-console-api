@@ -20,19 +20,41 @@ class DeviceManager {
 
     this.initialize()
 
-    this.pubsub.subscribe('RF_SIGNAL_RECEIVED', async () => {
-      const device = this.getDevices().find(
-        (d) => d.name === 'Garage Door Opener'
-      )
-      if (device) {
-        this.rfReceive.pause()
+    this.pubsub.subscribe('RF_SIGNAL_RECEIVED', ({ rfSignalReceived }) => {
+      const { code } = rfSignalReceived
+
+      const rfDevices = this.rf.getDevices()
+
+      const matchingDevice = rfDevices.find((d) => {
         try {
-          await this.rf.devicePulse({ device })
-        } catch (err) {
-          console.error('RF transmit error:', err)
-        } finally {
-          this.rfReceive.resume()
+          return JSON.parse(d.config || '{}').receiveCode === code
+        } catch {
+          return false
         }
+      })
+
+      if (!matchingDevice) {
+        const hasAnyReceiveCode = rfDevices.some((d) => {
+          try {
+            return JSON.parse(d.config || '{}').receiveCode
+          } catch {
+            return false
+          }
+        })
+        if (!hasAnyReceiveCode) {
+          console.log(`RF code received (not yet configured): ${code}`)
+        }
+        return
+      }
+
+      const sensor = this.getDevices().find((d) => d.name === 'Garage Door Sensor')
+      const isClosed = sensor ? sensor.state === 1 : true
+      const targetName = isClosed ? 'Open Garage Door' : 'Close Garage Door'
+      const targetDevice = this.getDevices().find((d) => d.name === targetName)
+
+      if (targetDevice) {
+        console.log(`RF code matched — triggering: ${targetName}`)
+        this.pi.devicePulse({ device: targetDevice })
       }
     })
   }
@@ -50,6 +72,7 @@ class DeviceManager {
           break
         case 'RF':
           this.rf.addDevice({ device })
+          this.rfReceive.initialize({ device })
           break
         case 'RF_RECEIVE':
           this.rfReceive.initialize({ device })
@@ -110,7 +133,8 @@ class DeviceManager {
       case 'TUYA':
         return this.tuya.devicePulse({ device })
       case 'RF':
-        return this.rf.devicePulse({ device })
+        this.rfReceive.pause()
+        return this.rf.devicePulse({ device }).finally(() => this.rfReceive.resume())
     }
   }
 

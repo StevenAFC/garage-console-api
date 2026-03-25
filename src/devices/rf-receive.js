@@ -10,7 +10,7 @@ class RfReceive extends Service {
   }
 
   initialize({ device } = {}) {
-    if (!device) return
+    if (!device || this.device) return
     this.device = device
     this.start()
   }
@@ -23,12 +23,16 @@ class RfReceive extends Service {
     })
 
     this.shell.on('message', (message) => {
-      console.log('Received RF Signal:', message)
-      this.pubsub.publish('RF_SIGNAL_RECEIVED', {
-        rfSignalReceived: {
-          signal: message,
-        },
-      })
+      const parts = message.split(',')
+      if (parts.length === 3) {
+        const [code, protocol, pulselength] = parts.map(Number)
+        console.log(`Received RF code: ${code} (protocol ${protocol}, pulselength ${pulselength}μs)`)
+        this.pubsub.publish('RF_SIGNAL_RECEIVED', {
+          rfSignalReceived: { code, protocol, pulselength },
+        })
+      } else {
+        console.log('RF Receiver:', message)
+      }
     })
 
     this.shell.on('error', (err) => {
