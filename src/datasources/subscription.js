@@ -18,7 +18,7 @@ class SubscriptionAPI extends DataSource {
         auth,
       })
     } catch (e) {
-      console.log(e)
+      console.log(`SubscriptionAPI Datesource: ${e}`)
       return false
     }
 

@@ -41,7 +41,7 @@ class Pi extends Service {
           }
         }
       } catch (e) {
-        console.log(e)
+        console.log(`PI Device Init: ${e}`)
       }
     })
   }
@@ -64,7 +64,7 @@ class Pi extends Service {
       this.setState({ device, state })
       return true
     } catch (e) {
-      console.log(e)
+      console.log(`PI Device Pulse: ${e}`)
       return false
     }
   }
@@ -110,7 +110,7 @@ class Pi extends Service {
       })
       return true
     } catch (e) {
-      console.log(e)
+      console.log(`PI Device RelayTrigger: ${e}`)
       return false
     }
   }

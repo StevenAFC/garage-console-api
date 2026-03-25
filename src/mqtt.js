@@ -17,6 +17,10 @@ class Mqtt {
       this.resubscribe()
     })
 
+    this.mqttClient.on('close', () => {
+      console.log('MQTT Disconnected')
+    })
+
     this.mqttClient.on('error', (e) => {
       console.log(`MQTT Client: ${e}`)
     })

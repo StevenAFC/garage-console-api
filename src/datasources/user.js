@@ -42,7 +42,7 @@ class UserAPI extends DataSource {
         password: await bcrypt.hash(password, 10),
       })
     } catch (e) {
-      console.log(e)
+      console.log(`UserAPI Datesource: ${e}`)
       return false
     }
 

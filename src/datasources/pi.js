@@ -18,7 +18,7 @@ class PiApi extends DataSource {
           : Math.round(currentLoad.currentLoad),
       }
     } catch (e) {
-      console.log(e)
+      console.log(`PiApi Datesource: ${e}`)
       return null
     }
   }

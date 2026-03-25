@@ -31,7 +31,7 @@ class Messages {
             },
           })
         }
-        console.log(error.statusCode)
+        console.log(`Messages webPush: ${error.statusCode}`)
       })
     })
   }
