@@ -24,16 +24,33 @@ class DeviceManager {
       if (state !== 1) return
 
       const device = this.getDevice({ id })
-      if (!device || device.name !== 'RF Receiver Button') return
+      if (!device) return
 
-      const sensor = this.getDevices().find((d) => d.name === 'Garage Door Sensor')
-      const isClosed = sensor ? sensor.state === 1 : true
-      const targetName = isClosed ? 'Open Garage Door' : 'Close Garage Door'
-      const targetDevice = this.getDevices().find((d) => d.name === targetName)
-
-      if (targetDevice) {
-        console.log(`RF Remote Button triggered — ${targetName}`)
-        this.pi.devicePulse({ device: targetDevice })
+      switch (device.name) {
+        case 'RF Receiver Button A': {
+          const target = this.getDevices().find((d) => d.name === 'Open Garage Door')
+          if (target) {
+            console.log('RF Button A — Open Garage Door')
+            this.pi.devicePulse({ device: target })
+          }
+          break
+        }
+        case 'RF Receiver Button B': {
+          const target = this.getDevices().find((d) => d.name === 'Close Garage Door')
+          if (target) {
+            console.log('RF Button B — Close Garage Door')
+            this.pi.devicePulse({ device: target })
+          }
+          break
+        }
+        case 'RF Receiver Button C': {
+          const target = this.getDevices().find((d) => d.name === 'Gate')
+          if (target) {
+            console.log('RF Button C — Gate')
+            this.rf.devicePulse({ device: target })
+          }
+          break
+        }
       }
     })
   }
