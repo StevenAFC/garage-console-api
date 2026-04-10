@@ -24,7 +24,7 @@ class DeviceManager {
       if (state !== 1) return
 
       const device = this.getDevice({ id })
-      if (!device || device.name !== 'RF Remote Button') return
+      if (!device || device.name !== 'RF Receiver Button') return
 
       const sensor = this.getDevices().find((d) => d.name === 'Garage Door Sensor')
       const isClosed = sensor ? sensor.state === 1 : true
