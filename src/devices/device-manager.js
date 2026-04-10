@@ -47,7 +47,11 @@ class DeviceManager {
           const target = this.getDevices().find((d) => d.name === 'Gate')
           if (target) {
             console.log('RF Button C — Gate')
-            this.rf.devicePulse({ device: target })
+            this.rf.devicePulse({ device: target }).catch((err) => {
+              console.error('RF Button C error:', err)
+            })
+          } else {
+            console.error('RF Button C — Gate device not found')
           }
           break
         }
